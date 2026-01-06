@@ -455,60 +455,17 @@ function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoo
   );
 }
 
-// Connector line component using SVG curves
-function CurvedConnector({ hasBothParents }) {
-  // Dimensions
-  const width = hasBothParents ? 320 : 160;
-  const height = 50;
-  const midX = width / 2;
-  
-  // Control point for curve smoothness
-  const curveStrength = 25;
-  
-  if (hasBothParents) {
-    // Two curves: center-top to left-bottom and center-top to right-bottom
-    const leftX = 80;  // Where father branch is
-    const rightX = 240; // Where mother branch is
-    
-    return (
-      <svg width={width} height={height} className="overflow-visible">
-        {/* Curve to father (left) */}
-        <path
-          d={`M ${midX} 0 
-              C ${midX} ${curveStrength}, ${leftX} ${height - curveStrength}, ${leftX} ${height}`}
-          fill="none"
-          stroke="#a8a29e"
-          strokeWidth="2"
-        />
-        {/* Curve to mother (right) */}
-        <path
-          d={`M ${midX} 0 
-              C ${midX} ${curveStrength}, ${rightX} ${height - curveStrength}, ${rightX} ${height}`}
-          fill="none"
-          stroke="#a8a29e"
-          strokeWidth="2"
-        />
-      </svg>
-    );
-  } else {
-    // Single straight line down
-    return (
-      <svg width={40} height={height} className="overflow-visible">
-        <path
-          d={`M 20 0 L 20 ${height}`}
-          fill="none"
-          stroke="#a8a29e"
-          strokeWidth="2"
-        />
-      </svg>
-    );
-  }
-}
-
+// Connector using dynamic measurements
 function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
   const hasParents = node.father || node.mother;
   const hasBothParents = node.father && node.mother;
   const isExpanded = expandedNodes.has(node.id);
+  
+  const containerRef = useRef(null);
+  const fatherRef = useRef(null);
+  const motherRef = useRef(null);
+  const [curvePath, setCurvePath] = useState('');
+  const [svgSize, setSvgSize] = useState({ width: 0, height: 50 });
 
   const handleClick = (person) => {
     onSelectPerson(person);
@@ -517,8 +474,60 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
     }
   };
 
+  // Calculate curve paths based on actual DOM positions
+  useEffect(() => {
+    if (!isExpanded || !hasParents) return;
+    
+    const updateCurves = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      
+      const containerRect = container.getBoundingClientRect();
+      const height = 50;
+      
+      let paths = [];
+      let minX = Infinity;
+      let maxX = -Infinity;
+      
+      // Get center top point (where curves start)
+      const startX = containerRect.width / 2;
+      
+      if (fatherRef.current) {
+        const fatherRect = fatherRef.current.getBoundingClientRect();
+        const fatherCenterX = fatherRect.left + fatherRect.width / 2 - containerRect.left;
+        minX = Math.min(minX, fatherCenterX);
+        maxX = Math.max(maxX, fatherCenterX);
+        
+        // Cubic bezier from top-center to father
+        paths.push(`M ${startX} 0 C ${startX} 25, ${fatherCenterX} 25, ${fatherCenterX} ${height}`);
+      }
+      
+      if (motherRef.current) {
+        const motherRect = motherRef.current.getBoundingClientRect();
+        const motherCenterX = motherRect.left + motherRect.width / 2 - containerRect.left;
+        minX = Math.min(minX, motherCenterX);
+        maxX = Math.max(maxX, motherCenterX);
+        
+        // Cubic bezier from top-center to mother
+        paths.push(`M ${startX} 0 C ${startX} 25, ${motherCenterX} 25, ${motherCenterX} ${height}`);
+      }
+      
+      setCurvePath(paths.join(' '));
+      setSvgSize({ width: containerRect.width, height });
+    };
+    
+    // Update after render and on resize
+    const timer = setTimeout(updateCurves, 10);
+    window.addEventListener('resize', updateCurves);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateCurves);
+    };
+  }, [isExpanded, hasParents, expandedNodes]);
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center" ref={containerRef}>
       <PersonCard 
         person={node} 
         onClick={handleClick}
@@ -530,28 +539,45 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       
       {hasParents && isExpanded && (
         <>
-          {/* SVG curved connector */}
-          <CurvedConnector hasBothParents={hasBothParents} />
+          {/* SVG curved connector - positioned over the parent row */}
+          <div style={{ height: svgSize.height, width: '100%', display: 'flex', justifyContent: 'center' }}>
+            <svg 
+              width={svgSize.width || 100} 
+              height={svgSize.height} 
+              style={{ overflow: 'visible' }}
+            >
+              <path
+                d={curvePath}
+                fill="none"
+                stroke="#a8a29e"
+                strokeWidth="2"
+              />
+            </svg>
+          </div>
           
           {/* Parents row */}
-          <div className="flex" style={{ gap: hasBothParents ? '80px' : '0' }}>
+          <div className="flex gap-8">
             {node.father && (
-              <AncestryBranch
-                node={node.father}
-                onSelectPerson={onSelectPerson}
-                selectedPerson={selectedPerson}
-                expandedNodes={expandedNodes}
-                toggleExpand={toggleExpand}
-              />
+              <div ref={fatherRef}>
+                <AncestryBranch
+                  node={node.father}
+                  onSelectPerson={onSelectPerson}
+                  selectedPerson={selectedPerson}
+                  expandedNodes={expandedNodes}
+                  toggleExpand={toggleExpand}
+                />
+              </div>
             )}
             {node.mother && (
-              <AncestryBranch
-                node={node.mother}
-                onSelectPerson={onSelectPerson}
-                selectedPerson={selectedPerson}
-                expandedNodes={expandedNodes}
-                toggleExpand={toggleExpand}
-              />
+              <div ref={motherRef}>
+                <AncestryBranch
+                  node={node.mother}
+                  onSelectPerson={onSelectPerson}
+                  selectedPerson={selectedPerson}
+                  expandedNodes={expandedNodes}
+                  toggleExpand={toggleExpand}
+                />
+              </div>
             )}
           </div>
         </>
