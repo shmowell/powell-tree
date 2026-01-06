@@ -1,537 +1,711 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 
-// Sample family data - 10 generations for UX testing
+// Ancestry data - tracking heritage of Jordan Powell
+// Structure: each person has father and mother (ancestors branch downward)
 const familyData = {
   id: 1,
-  name: "Ezekiel Powell",
-  birth: "1780",
-  death: "1855",
-  photo: "👴",
-  spouse: { name: "Abigail Powell", birth: "1785", death: "1860", photo: "👵" },
-  children: [
-    {
-      id: 2,
-      name: "Josiah Powell",
-      birth: "1810",
-      death: "1885",
+  name: "Jordan Powell",
+  birth: "2000",
+  photo: "🧑",
+  father: {
+    id: 2,
+    name: "Michael Powell",
+    birth: "1972",
+    photo: "👨",
+    father: {
+      id: 4,
+      name: "Richard Powell",
+      birth: "1945",
+      death: "2020",
       photo: "👴",
-      spouse: { name: "Martha Powell", birth: "1815", death: "1890", photo: "👵" },
-      children: [
-        {
-          id: 5,
-          name: "Cornelius Powell",
-          birth: "1840",
-          death: "1915",
+      father: {
+        id: 8,
+        name: "Harold Powell",
+        birth: "1918",
+        death: "1995",
+        photo: "👴",
+        father: {
+          id: 16,
+          name: "Walter Powell",
+          birth: "1890",
+          death: "1968",
           photo: "👴",
-          spouse: { name: "Harriet Powell", birth: "1845", death: "1920", photo: "👵" },
-          children: [
-            {
-              id: 12,
-              name: "Walter Powell",
-              birth: "1870",
-              death: "1945",
+          father: {
+            id: 32,
+            name: "Cornelius Powell",
+            birth: "1862",
+            death: "1940",
+            photo: "👴",
+            father: {
+              id: 64,
+              name: "Josiah Powell",
+              birth: "1834",
+              death: "1912",
               photo: "👴",
-              spouse: { name: "Edith Powell", birth: "1875", death: "1950", photo: "👵" },
-              children: [
-                {
-                  id: 25,
-                  name: "Harold Powell",
-                  birth: "1900",
-                  death: "1975",
+              father: {
+                id: 128,
+                name: "Ezekiel Powell",
+                birth: "1806",
+                death: "1884",
+                photo: "👴",
+                father: {
+                  id: 256,
+                  name: "Nathaniel Powell",
+                  birth: "1778",
+                  death: "1856",
                   photo: "👴",
-                  spouse: { name: "Dorothy Powell", birth: "1905", death: "1980", photo: "👵" },
-                  children: [
-                    {
-                      id: 50,
-                      name: "Richard Powell",
-                      birth: "1930",
-                      death: "2005",
-                      photo: "👴",
-                      spouse: { name: "Barbara Powell", birth: "1935", death: "2015", photo: "👵" },
-                      children: [
-                        {
-                          id: 100,
-                          name: "David Powell",
-                          birth: "1955",
-                          photo: "👨",
-                          spouse: { name: "Linda Powell", birth: "1958", photo: "👩" },
-                          children: [
-                            {
-                              id: 200,
-                              name: "Michael Powell",
-                              birth: "1980",
-                              photo: "👨",
-                              spouse: { name: "Jennifer Powell", birth: "1982", photo: "👩" },
-                              children: [
-                                {
-                                  id: 400,
-                                  name: "Ethan Powell",
-                                  birth: "2005",
-                                  photo: "👦",
-                                  children: [
-                                    { id: 800, name: "Baby Powell", birth: "2024", photo: "👶", children: [] }
-                                  ]
-                                },
-                                { id: 401, name: "Sophia Powell", birth: "2008", photo: "👧", children: [] }
-                              ]
-                            },
-                            {
-                              id: 201,
-                              name: "Sarah Chen",
-                              birth: "1983",
-                              photo: "👩",
-                              spouse: { name: "Kevin Chen", birth: "1980", photo: "👨" },
-                              children: [
-                                { id: 402, name: "Emily Chen", birth: "2010", photo: "👧", children: [] },
-                                { id: 403, name: "Ryan Chen", birth: "2013", photo: "👦", children: [] }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          id: 101,
-                          name: "Susan Martinez",
-                          birth: "1958",
-                          photo: "👩",
-                          spouse: { name: "Carlos Martinez", birth: "1955", photo: "👨" },
-                          children: [
-                            {
-                              id: 202,
-                              name: "Daniel Martinez",
-                              birth: "1985",
-                              photo: "👨",
-                              spouse: { name: "Rachel Martinez", birth: "1987", photo: "👩" },
-                              children: [
-                                { id: 404, name: "Lucas Martinez", birth: "2015", photo: "👦", children: [] },
-                                { id: 405, name: "Mia Martinez", birth: "2018", photo: "👧", children: [] }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      id: 51,
-                      name: "Margaret Wilson",
-                      birth: "1933",
-                      death: "2010",
-                      photo: "👵",
-                      spouse: { name: "Robert Wilson", birth: "1930", death: "2008", photo: "👴" },
-                      children: [
-                        {
-                          id: 102,
-                          name: "James Wilson",
-                          birth: "1960",
-                          photo: "👨",
-                          spouse: { name: "Patricia Wilson", birth: "1962", photo: "👩" },
-                          children: [
-                            {
-                              id: 203,
-                              name: "Christopher Wilson",
-                              birth: "1988",
-                              photo: "👨",
-                              spouse: { name: "Amanda Wilson", birth: "1990", photo: "👩" },
-                              children: [
-                                { id: 406, name: "Oliver Wilson", birth: "2016", photo: "👦", children: [] },
-                                { id: 407, name: "Charlotte Wilson", birth: "2019", photo: "👧", children: [] }
-                              ]
-                            },
-                            {
-                              id: 204,
-                              name: "Jessica Brown",
-                              birth: "1990",
-                              photo: "👩",
-                              spouse: { name: "Matthew Brown", birth: "1988", photo: "👨" },
-                              children: [
-                                { id: 408, name: "Liam Brown", birth: "2018", photo: "👦", children: [] }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  father: { id: 512, name: "Samuel Powell", birth: "1750", death: "1828", photo: "👴" },
+                  mother: { id: 513, name: "Abigail Whitmore", birth: "1755", death: "1833", photo: "👵" }
                 },
-                {
-                  id: 26,
-                  name: "Florence Thompson",
-                  birth: "1903",
-                  death: "1978",
+                mother: {
+                  id: 257,
+                  name: "Prudence Ashford",
+                  birth: "1782",
+                  death: "1860",
                   photo: "👵",
-                  spouse: { name: "George Thompson", birth: "1900", death: "1975", photo: "👴" },
-                  children: [
-                    {
-                      id: 52,
-                      name: "William Thompson",
-                      birth: "1935",
-                      death: "2020",
-                      photo: "👴",
-                      spouse: { name: "Eleanor Thompson", birth: "1938", photo: "👵" },
-                      children: [
-                        {
-                          id: 103,
-                          name: "Thomas Thompson",
-                          birth: "1965",
-                          photo: "👨",
-                          spouse: { name: "Nancy Thompson", birth: "1967", photo: "👩" },
-                          children: [
-                            {
-                              id: 205,
-                              name: "Andrew Thompson",
-                              birth: "1992",
-                              photo: "👨",
-                              children: [
-                                { id: 409, name: "Henry Thompson", birth: "2020", photo: "👦", children: [] }
-                              ]
-                            },
-                            { id: 206, name: "Elizabeth Thompson", birth: "1995", photo: "👩", children: [] }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  father: { id: 514, name: "Elijah Ashford", birth: "1754", death: "1832", photo: "👴" },
+                  mother: { id: 515, name: "Mercy Blackwell", birth: "1758", death: "1836", photo: "👵" }
                 }
-              ]
+              },
+              mother: {
+                id: 129,
+                name: "Hannah Mercer",
+                birth: "1810",
+                death: "1888",
+                photo: "👵",
+                father: {
+                  id: 258,
+                  name: "Tobias Mercer",
+                  birth: "1782",
+                  death: "1860",
+                  photo: "👴",
+                  father: { id: 516, name: "Jonas Mercer", birth: "1754", death: "1832", photo: "👴" },
+                  mother: { id: 517, name: "Lydia Crane", birth: "1758", death: "1836", photo: "👵" }
+                },
+                mother: {
+                  id: 259,
+                  name: "Patience Holloway",
+                  birth: "1786",
+                  death: "1864",
+                  photo: "👵",
+                  father: { id: 518, name: "Silas Holloway", birth: "1758", death: "1836", photo: "👴" },
+                  mother: { id: 519, name: "Faith Goodwin", birth: "1762", death: "1840", photo: "👵" }
+                }
+              }
             },
-            {
-              id: 13,
-              name: "Adelaide Brooks",
-              birth: "1873",
+            mother: {
+              id: 65,
+              name: "Adelaide Thompson",
+              birth: "1838",
+              death: "1916",
+              photo: "👵",
+              father: {
+                id: 130,
+                name: "Edmund Thompson",
+                birth: "1810",
+                death: "1888",
+                photo: "👴",
+                father: {
+                  id: 260,
+                  name: "Reuben Thompson",
+                  birth: "1782",
+                  death: "1860",
+                  photo: "👴",
+                  father: { id: 520, name: "Caleb Thompson", birth: "1754", death: "1832", photo: "👴" },
+                  mother: { id: 521, name: "Bethany Shaw", birth: "1758", death: "1836", photo: "👵" }
+                },
+                mother: {
+                  id: 261,
+                  name: "Susannah Wentworth",
+                  birth: "1786",
+                  death: "1864",
+                  photo: "👵",
+                  father: { id: 522, name: "Amos Wentworth", birth: "1758", death: "1836", photo: "👴" },
+                  mother: { id: 523, name: "Charity Osgood", birth: "1762", death: "1840", photo: "👵" }
+                }
+              },
+              mother: {
+                id: 131,
+                name: "Harriet Sinclair",
+                birth: "1814",
+                death: "1892",
+                photo: "👵",
+                father: {
+                  id: 262,
+                  name: "Malcolm Sinclair",
+                  birth: "1786",
+                  death: "1864",
+                  photo: "👴",
+                  father: { id: 524, name: "Archibald Sinclair", birth: "1758", death: "1836", photo: "👴" },
+                  mother: { id: 525, name: "Flora MacLeod", birth: "1762", death: "1840", photo: "👵" }
+                },
+                mother: {
+                  id: 263,
+                  name: "Elspeth Campbell",
+                  birth: "1790",
+                  death: "1868",
+                  photo: "👵",
+                  father: { id: 526, name: "Duncan Campbell", birth: "1762", death: "1840", photo: "👴" },
+                  mother: { id: 527, name: "Moira Fraser", birth: "1766", death: "1844", photo: "👵" }
+                }
+              }
+            }
+          },
+          mother: {
+            id: 33,
+            name: "Clara Bennett",
+            birth: "1866",
+            death: "1944",
+            photo: "👵",
+            father: {
+              id: 66,
+              name: "George Bennett",
+              birth: "1838",
+              death: "1916",
+              photo: "👴",
+              father: {
+                id: 132,
+                name: "William Bennett",
+                birth: "1810",
+                death: "1888",
+                photo: "👴",
+                father: {
+                  id: 264,
+                  name: "John Bennett",
+                  birth: "1782",
+                  death: "1860",
+                  photo: "👴",
+                  father: { id: 528, name: "Thomas Bennett", birth: "1754", death: "1832", photo: "👴" },
+                  mother: { id: 529, name: "Mary Aldrich", birth: "1758", death: "1836", photo: "👵" }
+                },
+                mother: {
+                  id: 265,
+                  name: "Elizabeth Thorne",
+                  birth: "1786",
+                  death: "1864",
+                  photo: "👵",
+                  father: { id: 530, name: "Henry Thorne", birth: "1758", death: "1836", photo: "👴" },
+                  mother: { id: 531, name: "Anne Prescott", birth: "1762", death: "1840", photo: "👵" }
+                }
+              },
+              mother: {
+                id: 133,
+                name: "Margaret Hale",
+                birth: "1814",
+                death: "1892",
+                photo: "👵",
+                father: {
+                  id: 266,
+                  name: "Nathan Hale",
+                  birth: "1786",
+                  death: "1864",
+                  photo: "👴",
+                  father: { id: 532, name: "Enoch Hale", birth: "1758", death: "1836", photo: "👴" },
+                  mother: { id: 533, name: "Sarah Whiting", birth: "1762", death: "1840", photo: "👵" }
+                },
+                mother: {
+                  id: 267,
+                  name: "Catherine Brewster",
+                  birth: "1790",
+                  death: "1868",
+                  photo: "👵",
+                  father: { id: 534, name: "Joseph Brewster", birth: "1762", death: "1840", photo: "👴" },
+                  mother: { id: 535, name: "Ruth Standish", birth: "1766", death: "1844", photo: "👵" }
+                }
+              }
+            },
+            mother: {
+              id: 67,
+              name: "Louisa Carrington",
+              birth: "1842",
+              death: "1920",
+              photo: "👵",
+              father: {
+                id: 134,
+                name: "Frederick Carrington",
+                birth: "1814",
+                death: "1892",
+                photo: "👴",
+                father: {
+                  id: 268,
+                  name: "Charles Carrington",
+                  birth: "1786",
+                  death: "1864",
+                  photo: "👴",
+                  father: { id: 536, name: "Edward Carrington", birth: "1758", death: "1836", photo: "👴" },
+                  mother: { id: 537, name: "Dorothy Langley", birth: "1762", death: "1840", photo: "👵" }
+                },
+                mother: {
+                  id: 269,
+                  name: "Victoria Ashworth",
+                  birth: "1790",
+                  death: "1868",
+                  photo: "👵",
+                  father: { id: 538, name: "Alfred Ashworth", birth: "1762", death: "1840", photo: "👴" },
+                  mother: { id: 539, name: "Georgiana Blackwood", birth: "1766", death: "1844", photo: "👵" }
+                }
+              },
+              mother: {
+                id: 135,
+                name: "Amelia Waverly",
+                birth: "1818",
+                death: "1896",
+                photo: "👵",
+                father: {
+                  id: 270,
+                  name: "Arthur Waverly",
+                  birth: "1790",
+                  death: "1868",
+                  photo: "👴",
+                  father: { id: 540, name: "Richard Waverly", birth: "1762", death: "1840", photo: "👴" },
+                  mother: { id: 541, name: "Frances Pemberton", birth: "1766", death: "1844", photo: "👵" }
+                },
+                mother: {
+                  id: 271,
+                  name: "Isabella Thornton",
+                  birth: "1794",
+                  death: "1872",
+                  photo: "👵",
+                  father: { id: 542, name: "Robert Thornton", birth: "1766", death: "1844", photo: "👴" },
+                  mother: { id: 543, name: "Eleanor Whitfield", birth: "1770", death: "1848", photo: "👵" }
+                }
+              }
+            }
+          }
+        },
+        mother: {
+          id: 9,
+          name: "Dorothy Clarke",
+          birth: "1922",
+          death: "2010",
+          photo: "👵",
+          father: {
+            id: 18,
+            name: "Albert Clarke",
+            birth: "1894",
+            death: "1972",
+            photo: "👴",
+            father: {
+              id: 36,
+              name: "Ernest Clarke",
+              birth: "1866",
+              death: "1944",
+              photo: "👴",
+              father: {
+                id: 72,
+                name: "Samuel Clarke",
+                birth: "1838",
+                death: "1916",
+                photo: "👴",
+                father: {
+                  id: 144,
+                  name: "Isaac Clarke",
+                  birth: "1810",
+                  death: "1888",
+                  photo: "👴",
+                  father: {
+                    id: 288,
+                    name: "Jacob Clarke",
+                    birth: "1782",
+                    death: "1860",
+                    photo: "👴",
+                    father: { id: 576, name: "Abraham Clarke", birth: "1754", death: "1832", photo: "👴" },
+                    mother: { id: 577, name: "Rebecca Stone", birth: "1758", death: "1836", photo: "👵" }
+                  },
+                  mother: {
+                    id: 289,
+                    name: "Deborah Marsh",
+                    birth: "1786",
+                    death: "1864",
+                    photo: "👵",
+                    father: { id: 578, name: "Benjamin Marsh", birth: "1758", death: "1836", photo: "👴" },
+                    mother: { id: 579, name: "Abigail Sawyer", birth: "1762", death: "1840", photo: "👵" }
+                  }
+                },
+                mother: {
+                  id: 145,
+                  name: "Rachel Hoffman",
+                  birth: "1814",
+                  death: "1892",
+                  photo: "👵",
+                  father: {
+                    id: 290,
+                    name: "Peter Hoffman",
+                    birth: "1786",
+                    death: "1864",
+                    photo: "👴",
+                    father: { id: 580, name: "Johann Hoffman", birth: "1758", death: "1836", photo: "👴" },
+                    mother: { id: 581, name: "Katarina Weber", birth: "1762", death: "1840", photo: "👵" }
+                  },
+                  mother: {
+                    id: 291,
+                    name: "Anna Schmidt",
+                    birth: "1790",
+                    death: "1868",
+                    photo: "👵",
+                    father: { id: 582, name: "Friedrich Schmidt", birth: "1762", death: "1840", photo: "👴" },
+                    mother: { id: 583, name: "Margarethe Braun", birth: "1766", death: "1844", photo: "👵" }
+                  }
+                }
+              },
+              mother: {
+                id: 73,
+                name: "Emma Sullivan",
+                birth: "1842",
+                death: "1920",
+                photo: "👵",
+                father: {
+                  id: 146,
+                  name: "Patrick Sullivan",
+                  birth: "1814",
+                  death: "1892",
+                  photo: "👴",
+                  father: {
+                    id: 292,
+                    name: "Sean Sullivan",
+                    birth: "1786",
+                    death: "1864",
+                    photo: "👴",
+                    father: { id: 584, name: "Liam Sullivan", birth: "1758", death: "1836", photo: "👴" },
+                    mother: { id: 585, name: "Brigid O'Connor", birth: "1762", death: "1840", photo: "👵" }
+                  },
+                  mother: {
+                    id: 293,
+                    name: "Siobhan Murphy",
+                    birth: "1790",
+                    death: "1868",
+                    photo: "👵",
+                    father: { id: 586, name: "Declan Murphy", birth: "1762", death: "1840", photo: "👴" },
+                    mother: { id: 587, name: "Aoife Byrne", birth: "1766", death: "1844", photo: "👵" }
+                  }
+                },
+                mother: {
+                  id: 147,
+                  name: "Nora Fitzgerald",
+                  birth: "1818",
+                  death: "1896",
+                  photo: "👵",
+                  father: {
+                    id: 294,
+                    name: "Michael Fitzgerald",
+                    birth: "1790",
+                    death: "1868",
+                    photo: "👴",
+                    father: { id: 588, name: "Padraig Fitzgerald", birth: "1762", death: "1840", photo: "👴" },
+                    mother: { id: 589, name: "Caitlin Walsh", birth: "1766", death: "1844", photo: "👵" }
+                  },
+                  mother: {
+                    id: 295,
+                    name: "Mary Gallagher",
+                    birth: "1794",
+                    death: "1872",
+                    photo: "👵",
+                    father: { id: 590, name: "Eamon Gallagher", birth: "1766", death: "1844", photo: "👴" },
+                    mother: { id: 591, name: "Eileen Doyle", birth: "1770", death: "1848", photo: "👵" }
+                  }
+                }
+              }
+            },
+            mother: {
+              id: 37,
+              name: "Rose Moretti",
+              birth: "1870",
               death: "1948",
               photo: "👵",
-              spouse: { name: "Frederick Brooks", birth: "1870", death: "1945", photo: "👴" },
-              children: [
-                {
-                  id: 27,
-                  name: "Arthur Brooks",
-                  birth: "1905",
-                  death: "1980",
+              father: {
+                id: 74,
+                name: "Giuseppe Moretti",
+                birth: "1842",
+                death: "1920",
+                photo: "👴",
+                father: {
+                  id: 148,
+                  name: "Antonio Moretti",
+                  birth: "1814",
+                  death: "1892",
                   photo: "👴",
-                  spouse: { name: "Lillian Brooks", birth: "1908", death: "1985", photo: "👵" },
-                  children: [
-                    {
-                      id: 53,
-                      name: "Edward Brooks",
-                      birth: "1938",
-                      photo: "👨",
-                      spouse: { name: "Virginia Brooks", birth: "1940", photo: "👩" },
-                      children: [
-                        {
-                          id: 104,
-                          name: "Steven Brooks",
-                          birth: "1968",
-                          photo: "👨",
-                          spouse: { name: "Michelle Brooks", birth: "1970", photo: "👩" },
-                          children: [
-                            {
-                              id: 207,
-                              name: "Brandon Brooks",
-                              birth: "1995",
-                              photo: "👨",
-                              spouse: { name: "Kayla Brooks", birth: "1996", photo: "👩" },
-                              children: [
-                                { id: 410, name: "Zoey Brooks", birth: "2022", photo: "👧", children: [] }
-                              ]
-                            },
-                            { id: 208, name: "Brittany Brooks", birth: "1998", photo: "👩", children: [] }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  father: {
+                    id: 296,
+                    name: "Marco Moretti",
+                    birth: "1786",
+                    death: "1864",
+                    photo: "👴",
+                    father: { id: 592, name: "Lorenzo Moretti", birth: "1758", death: "1836", photo: "👴" },
+                    mother: { id: 593, name: "Lucia Rossi", birth: "1762", death: "1840", photo: "👵" }
+                  },
+                  mother: {
+                    id: 297,
+                    name: "Francesca Bianchi",
+                    birth: "1790",
+                    death: "1868",
+                    photo: "👵",
+                    father: { id: 594, name: "Giovanni Bianchi", birth: "1762", death: "1840", photo: "👴" },
+                    mother: { id: 595, name: "Maria Romano", birth: "1766", death: "1844", photo: "👵" }
+                  }
+                },
+                mother: {
+                  id: 149,
+                  name: "Sofia Russo",
+                  birth: "1818",
+                  death: "1896",
+                  photo: "👵",
+                  father: {
+                    id: 298,
+                    name: "Pietro Russo",
+                    birth: "1790",
+                    death: "1868",
+                    photo: "👴",
+                    father: { id: 596, name: "Salvatore Russo", birth: "1762", death: "1840", photo: "👴" },
+                    mother: { id: 597, name: "Carmela Esposito", birth: "1766", death: "1844", photo: "👵" }
+                  },
+                  mother: {
+                    id: 299,
+                    name: "Angela Colombo",
+                    birth: "1794",
+                    death: "1872",
+                    photo: "👵",
+                    father: { id: 598, name: "Vittorio Colombo", birth: "1766", death: "1844", photo: "👴" },
+                    mother: { id: 599, name: "Teresa Conti", birth: "1770", death: "1848", photo: "👵" }
+                  }
                 }
-              ]
+              },
+              mother: {
+                id: 75,
+                name: "Caterina Ferrari",
+                birth: "1846",
+                death: "1924",
+                photo: "👵",
+                father: {
+                  id: 150,
+                  name: "Alessandro Ferrari",
+                  birth: "1818",
+                  death: "1896",
+                  photo: "👴",
+                  father: {
+                    id: 300,
+                    name: "Giacomo Ferrari",
+                    birth: "1790",
+                    death: "1868",
+                    photo: "👴",
+                    father: { id: 600, name: "Paolo Ferrari", birth: "1762", death: "1840", photo: "👴" },
+                    mother: { id: 601, name: "Elena Ricci", birth: "1766", death: "1844", photo: "👵" }
+                  },
+                  mother: {
+                    id: 301,
+                    name: "Giulia Martini",
+                    birth: "1794",
+                    death: "1872",
+                    photo: "👵",
+                    father: { id: 602, name: "Roberto Martini", birth: "1766", death: "1844", photo: "👴" },
+                    mother: { id: 603, name: "Chiara Gallo", birth: "1770", death: "1848", photo: "👵" }
+                  }
+                },
+                mother: {
+                  id: 151,
+                  name: "Elisabetta Lombardi",
+                  birth: "1822",
+                  death: "1900",
+                  photo: "👵",
+                  father: {
+                    id: 302,
+                    name: "Stefano Lombardi",
+                    birth: "1794",
+                    death: "1872",
+                    photo: "👴",
+                    father: { id: 604, name: "Massimo Lombardi", birth: "1766", death: "1844", photo: "👴" },
+                    mother: { id: 605, name: "Beatrice Fontana", birth: "1770", death: "1848", photo: "👵" }
+                  },
+                  mother: {
+                    id: 303,
+                    name: "Maddalena Greco",
+                    birth: "1798",
+                    death: "1876",
+                    photo: "👵",
+                    father: { id: 606, name: "Domenico Greco", birth: "1770", death: "1848", photo: "👴" },
+                    mother: { id: 607, name: "Rosalia Leone", birth: "1774", death: "1852", photo: "👵" }
+                  }
+                }
+              }
             }
-          ]
-        },
-        {
-          id: 6,
-          name: "Beatrice Adams",
-          birth: "1843",
-          death: "1918",
-          photo: "👵",
-          spouse: { name: "Samuel Adams", birth: "1840", death: "1915", photo: "👴" },
-          children: [
-            {
-              id: 14,
-              name: "Charles Adams",
-              birth: "1875",
-              death: "1950",
+          },
+          mother: {
+            id: 19,
+            name: "Edith Montgomery",
+            birth: "1898",
+            death: "1980",
+            photo: "👵",
+            father: {
+              id: 38,
+              name: "Charles Montgomery",
+              birth: "1870",
+              death: "1948",
               photo: "👴",
-              spouse: { name: "Clara Adams", birth: "1878", death: "1955", photo: "👵" },
-              children: [
-                {
-                  id: 28,
-                  name: "Raymond Adams",
-                  birth: "1908",
-                  death: "1983",
-                  photo: "👴",
-                  spouse: { name: "Helen Adams", birth: "1910", death: "1988", photo: "👵" },
-                  children: [
-                    {
-                      id: 54,
-                      name: "Donald Adams",
-                      birth: "1940",
-                      photo: "👨",
-                      spouse: { name: "Carol Adams", birth: "1942", photo: "👩" },
-                      children: [
-                        {
-                          id: 105,
-                          name: "Kenneth Adams",
-                          birth: "1970",
-                          photo: "👨",
-                          spouse: { name: "Laura Adams", birth: "1972", photo: "👩" },
-                          children: [
-                            {
-                              id: 209,
-                              name: "Tyler Adams",
-                              birth: "1998",
-                              photo: "👨",
-                              children: [
-                                { id: 411, name: "Luna Adams", birth: "2023", photo: "👶", children: [] }
-                              ]
-                            },
-                            { id: 210, name: "Ashley Adams", birth: "2000", photo: "👩", children: [] }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
+            },
+            mother: {
+              id: 39,
+              name: "Virginia Hartwell",
+              birth: "1874",
+              death: "1952",
+              photo: "👵",
             }
-          ]
+          }
         }
-      ]
+      },
+      mother: {
+        id: 5,
+        name: "Barbara Williams",
+        birth: "1948",
+        photo: "👩",
+        father: {
+          id: 10,
+          name: "Robert Williams",
+          birth: "1920",
+          death: "2005",
+          photo: "👴",
+          father: {
+            id: 20,
+            name: "James Williams",
+            birth: "1892",
+            death: "1970",
+            photo: "👴",
+          },
+          mother: {
+            id: 21,
+            name: "Helen Foster",
+            birth: "1896",
+            death: "1978",
+            photo: "👵",
+          }
+        },
+        mother: {
+          id: 11,
+          name: "Mary O'Brien",
+          birth: "1924",
+          death: "2012",
+          photo: "👵",
+          father: {
+            id: 22,
+            name: "Patrick O'Brien",
+            birth: "1896",
+            death: "1974",
+            photo: "👴",
+          },
+          mother: {
+            id: 23,
+            name: "Kathleen Brennan",
+            birth: "1900",
+            death: "1982",
+            photo: "👵",
+          }
+        }
+      }
     },
-    {
+    mother: {
       id: 3,
-      name: "Prudence Clarke",
-      birth: "1812",
-      death: "1887",
-      photo: "👵",
-      spouse: { name: "Nathaniel Clarke", birth: "1808", death: "1882", photo: "👴" },
-      children: [
-        {
-          id: 7,
-          name: "Edmund Clarke",
-          birth: "1845",
-          death: "1920",
+      name: "Jennifer Chen",
+      birth: "1975",
+      photo: "👩",
+      father: {
+        id: 6,
+        name: "David Chen",
+        birth: "1948",
+        photo: "👨",
+        father: {
+          id: 12,
+          name: "Wei Chen",
+          birth: "1920",
+          death: "2008",
           photo: "👴",
-          spouse: { name: "Louisa Clarke", birth: "1848", death: "1923", photo: "👵" },
-          children: [
-            {
-              id: 15,
-              name: "Albert Clarke",
-              birth: "1878",
-              death: "1953",
-              photo: "👴",
-              spouse: { name: "Rose Clarke", birth: "1880", death: "1958", photo: "👵" },
-              children: [
-                {
-                  id: 29,
-                  name: "Frank Clarke",
-                  birth: "1910",
-                  death: "1985",
-                  photo: "👴",
-                  spouse: { name: "Ruth Clarke", birth: "1912", death: "1990", photo: "👵" },
-                  children: [
-                    {
-                      id: 55,
-                      name: "Gerald Clarke",
-                      birth: "1942",
-                      photo: "👨",
-                      spouse: { name: "Judith Clarke", birth: "1944", photo: "👩" },
-                      children: [
-                        {
-                          id: 106,
-                          name: "Mark Clarke",
-                          birth: "1972",
-                          photo: "👨",
-                          spouse: { name: "Diane Clarke", birth: "1974", photo: "👩" },
-                          children: [
-                            {
-                              id: 211,
-                              name: "Justin Clarke",
-                              birth: "2000",
-                              photo: "👨",
-                              children: []
-                            },
-                            { id: 212, name: "Amber Clarke", birth: "2003", photo: "👩", children: [] }
-                          ]
-                        },
-                        {
-                          id: 107,
-                          name: "Lisa Garcia",
-                          birth: "1975",
-                          photo: "👩",
-                          spouse: { name: "Antonio Garcia", birth: "1973", photo: "👨" },
-                          children: [
-                            { id: 213, name: "Isabella Garcia", birth: "2002", photo: "👩", children: [] },
-                            { id: 214, name: "Diego Garcia", birth: "2005", photo: "👨", children: [] }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 4,
-      name: "Ephraim Powell",
-      birth: "1815",
-      death: "1890",
-      photo: "👴",
-      spouse: { name: "Susannah Powell", birth: "1818", death: "1893", photo: "👵" },
-      children: [
-        {
-          id: 8,
-          name: "Horace Powell",
-          birth: "1848",
-          death: "1923",
-          photo: "👴",
-          spouse: { name: "Matilda Powell", birth: "1850", death: "1925", photo: "👵" },
-          children: [
-            {
-              id: 16,
-              name: "Ernest Powell",
-              birth: "1880",
-              death: "1955",
-              photo: "👴",
-              spouse: { name: "Mabel Powell", birth: "1882", death: "1960", photo: "👵" },
-              children: [
-                {
-                  id: 30,
-                  name: "Howard Powell",
-                  birth: "1912",
-                  death: "1987",
-                  photo: "👴",
-                  spouse: { name: "Evelyn Powell", birth: "1915", death: "1992", photo: "👵" },
-                  children: [
-                    {
-                      id: 56,
-                      name: "Roger Powell",
-                      birth: "1945",
-                      photo: "👨",
-                      spouse: { name: "Shirley Powell", birth: "1947", photo: "👩" },
-                      children: [
-                        {
-                          id: 108,
-                          name: "Timothy Powell",
-                          birth: "1975",
-                          photo: "👨",
-                          spouse: { name: "Heather Powell", birth: "1977", photo: "👩" },
-                          children: [
-                            {
-                              id: 215,
-                              name: "Nathan Powell",
-                              birth: "2003",
-                              photo: "👨",
-                              children: []
-                            },
-                            { id: 216, name: "Samantha Powell", birth: "2006", photo: "👩", children: [] }
-                          ]
-                        },
-                        {
-                          id: 109,
-                          name: "Rebecca Lee",
-                          birth: "1978",
-                          photo: "👩",
-                          spouse: { name: "Jason Lee", birth: "1976", photo: "👨" },
-                          children: [
-                            { id: 217, name: "Aiden Lee", birth: "2008", photo: "👦", children: [] },
-                            { id: 218, name: "Chloe Lee", birth: "2011", photo: "👧", children: [] }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      id: 57,
-                      name: "Janet Taylor",
-                      birth: "1948",
-                      photo: "👩",
-                      spouse: { name: "Larry Taylor", birth: "1945", death: "2018", photo: "👴" },
-                      children: [
-                        {
-                          id: 110,
-                          name: "Brian Taylor",
-                          birth: "1978",
-                          photo: "👨",
-                          spouse: { name: "Stephanie Taylor", birth: "1980", photo: "👩" },
-                          children: [
-                            { id: 219, name: "Mason Taylor", birth: "2010", photo: "👦", children: [] },
-                            { id: 220, name: "Ella Taylor", birth: "2013", photo: "👧", children: [] }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          father: {
+            id: 24,
+            name: "Liang Chen",
+            birth: "1892",
+            death: "1970",
+            photo: "👴",
+          },
+          mother: {
+            id: 25,
+            name: "Mei Lin Zhang",
+            birth: "1896",
+            death: "1978",
+            photo: "👵",
+          }
         },
-        {
-          id: 9,
-          name: "Lucinda Morgan",
-          birth: "1850",
-          death: "1925",
+        mother: {
+          id: 13,
+          name: "Hua Wang",
+          birth: "1924",
+          death: "2015",
           photo: "👵",
-          spouse: { name: "Theodore Morgan", birth: "1848", death: "1920", photo: "👴" },
-          children: [
-            {
-              id: 17,
-              name: "Clarence Morgan",
-              birth: "1882",
-              death: "1957",
-              photo: "👴",
-              spouse: { name: "Pearl Morgan", birth: "1885", death: "1962", photo: "👵" },
-              children: [
-                {
-                  id: 31,
-                  name: "Vernon Morgan",
-                  birth: "1915",
-                  death: "1990",
-                  photo: "👴",
-                  spouse: { name: "Irene Morgan", birth: "1918", death: "1995", photo: "👵" },
-                  children: [
-                    {
-                      id: 58,
-                      name: "Dennis Morgan",
-                      birth: "1948",
-                      photo: "👨",
-                      spouse: { name: "Sandra Morgan", birth: "1950", photo: "👩" },
-                      children: [
-                        {
-                          id: 111,
-                          name: "Scott Morgan",
-                          birth: "1980",
-                          photo: "👨",
-                          spouse: { name: "Kimberly Morgan", birth: "1982", photo: "👩" },
-                          children: [
-                            { id: 221, name: "Logan Morgan", birth: "2012", photo: "👦", children: [] },
-                            { id: 222, name: "Avery Morgan", birth: "2015", photo: "👧", children: [] }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          father: {
+            id: 26,
+            name: "Jun Wang",
+            birth: "1896",
+            death: "1974",
+            photo: "👴",
+          },
+          mother: {
+            id: 27,
+            name: "Xiu Li",
+            birth: "1900",
+            death: "1982",
+            photo: "👵",
+          }
         }
-      ]
+      },
+      mother: {
+        id: 7,
+        name: "Susan Park",
+        birth: "1952",
+        photo: "👩",
+        father: {
+          id: 14,
+          name: "Jin Park",
+          birth: "1924",
+          death: "2010",
+          photo: "👴",
+          father: {
+            id: 28,
+            name: "Sung Park",
+            birth: "1896",
+            death: "1974",
+            photo: "👴",
+          },
+          mother: {
+            id: 29,
+            name: "Young Kim",
+            birth: "1900",
+            death: "1982",
+            photo: "👵",
+          }
+        },
+        mother: {
+          id: 15,
+          name: "Hana Lee",
+          birth: "1928",
+          death: "2018",
+          photo: "👵",
+          father: {
+            id: 30,
+            name: "Min Lee",
+            birth: "1900",
+            death: "1978",
+            photo: "👴",
+          },
+          mother: {
+            id: 31,
+            name: "Soo Choi",
+            birth: "1904",
+            death: "1986",
+            photo: "👵",
+          }
+        }
+      }
     }
-  ]
+  }
 };
 
-function PersonCard({ person, isSpouse, onClick, isSelected, isExpanded, hasChildren }) {
+function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoot }) {
   const isDeceased = person.death;
   
   return (
@@ -542,22 +716,23 @@ function PersonCard({ person, isSpouse, onClick, isSelected, isExpanded, hasChil
       }}
       className={`
         relative cursor-pointer transition-all duration-300 ease-out
-        ${isSpouse ? 'scale-90' : ''}
         ${isSelected ? 'scale-105 z-10' : 'hover:scale-102'}
       `}
     >
       <div 
         className={`
           relative px-4 py-3 rounded-2xl border-2 transition-all duration-300
-          ${isSelected 
-            ? 'border-amber-600 bg-amber-50 shadow-xl shadow-amber-200/50' 
-            : 'border-stone-300 bg-white/90 hover:border-amber-400 hover:shadow-lg'
+          ${isRoot 
+            ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg shadow-amber-200/50' 
+            : isSelected 
+              ? 'border-amber-600 bg-amber-50 shadow-xl shadow-amber-200/50' 
+              : 'border-stone-300 bg-white/90 hover:border-amber-400 hover:shadow-lg'
           }
-          ${isDeceased ? 'opacity-80' : ''}
+          ${isDeceased && !isRoot ? 'opacity-80' : ''}
         `}
         style={{
           backdropFilter: 'blur(8px)',
-          minWidth: '140px',
+          minWidth: '150px',
         }}
       >
         {isDeceased && (
@@ -566,10 +741,10 @@ function PersonCard({ person, isSpouse, onClick, isSelected, isExpanded, hasChil
         
         <div className="flex items-center gap-3">
           <div 
-            className="text-2xl w-10 h-10 rounded-full flex items-center justify-center"
+            className={`text-2xl w-10 h-10 rounded-full flex items-center justify-center ${isRoot ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
             style={{
-              background: isSpouse 
-                ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' 
+              background: isRoot 
+                ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
                 : 'linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)',
             }}
           >
@@ -585,7 +760,7 @@ function PersonCard({ person, isSpouse, onClick, isSelected, isExpanded, hasChil
           </div>
         </div>
         
-        {hasChildren && !isSpouse && (
+        {hasParents && (
           <div 
             className={`
               absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 
@@ -605,17 +780,17 @@ function PersonCard({ person, isSpouse, onClick, isSelected, isExpanded, hasChil
   );
 }
 
-function ChildrenContainer({ children, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, level }) {
+function ParentsContainer({ father, mother, onSelectPerson, selectedPerson, expandedNodes, toggleExpand }) {
   const containerRef = useRef(null);
   const [linePositions, setLinePositions] = useState({ left: 0, right: 0 });
 
   useEffect(() => {
     const updateLines = () => {
-      if (containerRef.current && children.length > 1) {
+      if (containerRef.current) {
         const container = containerRef.current;
         const childNodes = container.querySelectorAll(':scope > div');
         
-        if (childNodes.length > 0) {
+        if (childNodes.length === 2) {
           const containerRect = container.getBoundingClientRect();
           const centers = [];
           
@@ -627,35 +802,29 @@ function ChildrenContainer({ children, onSelectPerson, selectedPerson, expandedN
           
           setLinePositions({
             left: centers[0],
-            right: centers[centers.length - 1]
+            right: centers[1]
           });
         }
       }
     };
 
     updateLines();
-    
-    // Also update on window resize
     window.addEventListener('resize', updateLines);
-    
-    // Small delay to ensure DOM is fully rendered
     const timeout = setTimeout(updateLines, 100);
     
     return () => {
       window.removeEventListener('resize', updateLines);
       clearTimeout(timeout);
     };
-  }, [children, expandedNodes]);
+  }, [father, mother, expandedNodes]);
 
   return (
     <div className="relative mt-8">
-      {/* Vertical line from parent */}
-      <div 
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-6 -mt-6 bg-stone-400"
-      />
+      {/* Vertical line from child to parents */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-6 -mt-6 bg-stone-400" />
       
-      {/* Horizontal connecting line */}
-      {children.length > 1 && linePositions.right > linePositions.left && (
+      {/* Horizontal connecting line between parents */}
+      {linePositions.right > linePositions.left && (
         <div 
           className="absolute top-0 h-0.5 -mt-2 bg-stone-400"
           style={{
@@ -665,77 +834,73 @@ function ChildrenContainer({ children, onSelectPerson, selectedPerson, expandedN
         />
       )}
       
-      {/* Children */}
-      <div ref={containerRef} className="flex gap-8 items-start">
-        {children.map((child) => (
-          <div key={child.id} className="relative flex flex-col items-center">
-            {/* Vertical line to each child */}
-            <div 
-              className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-4 bg-stone-400"
-            />
+      {/* Parents */}
+      <div ref={containerRef} className="flex gap-6 items-start justify-center">
+        {father && (
+          <div className="relative flex flex-col items-center">
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-4 bg-stone-400" />
             <div className="pt-4">
-              <FamilyNode 
-                node={child} 
-                level={level + 1}
+              <AncestorNode 
+                node={father}
                 onSelectPerson={onSelectPerson}
                 selectedPerson={selectedPerson}
                 expandedNodes={expandedNodes}
                 toggleExpand={toggleExpand}
+                side="father"
               />
             </div>
           </div>
-        ))}
+        )}
+        {mother && (
+          <div className="relative flex flex-col items-center">
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-4 bg-stone-400" />
+            <div className="pt-4">
+              <AncestorNode 
+                node={mother}
+                onSelectPerson={onSelectPerson}
+                selectedPerson={selectedPerson}
+                expandedNodes={expandedNodes}
+                toggleExpand={toggleExpand}
+                side="mother"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function FamilyNode({ node, level = 0, onSelectPerson, selectedPerson, expandedNodes, toggleExpand }) {
-  const hasChildren = node.children && node.children.length > 0;
+function AncestorNode({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, side, isRoot = false }) {
+  const hasParents = node.father || node.mother;
   const isExpanded = expandedNodes.has(node.id);
 
   const handleClick = (person) => {
     onSelectPerson(person);
-    if (hasChildren && person.id === node.id) {
+    if (hasParents && person.id === node.id) {
       toggleExpand(node.id);
     }
   };
 
   return (
     <div className="flex flex-col items-center animate-fadeIn">
-      <div className="flex items-center gap-2">
-        <PersonCard 
-          person={node} 
-          onClick={handleClick}
-          isSelected={selectedPerson?.id === node.id}
-          isExpanded={isExpanded}
-          hasChildren={hasChildren}
-        />
-        {node.spouse && (
-          <>
-            <div className="flex items-center gap-1">
-              <div className="w-6 h-0.5 bg-gradient-to-r from-amber-300 to-rose-300 rounded-full" />
-              <div className="text-rose-400 text-lg">♥</div>
-              <div className="w-6 h-0.5 bg-gradient-to-l from-amber-300 to-rose-300 rounded-full" />
-            </div>
-            <PersonCard 
-              person={node.spouse} 
-              isSpouse 
-              onClick={() => onSelectPerson(node.spouse)}
-              isSelected={selectedPerson?.name === node.spouse.name}
-            />
-          </>
-        )}
-      </div>
+      <PersonCard 
+        person={node} 
+        onClick={handleClick}
+        isSelected={selectedPerson?.id === node.id}
+        isExpanded={isExpanded}
+        hasParents={hasParents}
+        isRoot={isRoot}
+      />
       
-      {hasChildren && isExpanded && (
-        <ChildrenContainer
-          children={node.children}
+      {hasParents && isExpanded && (
+        <ParentsContainer
+          father={node.father}
+          mother={node.mother}
           onSelectPerson={onSelectPerson}
           selectedPerson={selectedPerson}
           expandedNodes={expandedNodes}
           toggleExpand={toggleExpand}
-          level={level}
         />
       )}
     </div>
@@ -832,7 +997,6 @@ function PannableCanvas({ children, zoom }) {
   const [hasMoved, setHasMoved] = useState(false);
 
   const handleMouseDown = (e) => {
-    // Don't start dragging if clicking on a card or button
     if (e.target.closest('[data-card]') || e.target.closest('button')) return;
     
     setIsDragging(true);
@@ -927,7 +1091,6 @@ function PannableCanvas({ children, zoom }) {
         </div>
       </div>
       
-      {/* Reset position button */}
       {(position.x !== 0 || position.y !== 0) && (
         <button
           onClick={resetPosition}
@@ -960,11 +1123,8 @@ export default function App() {
   const expandAll = () => {
     const getAllIds = (node) => {
       let ids = [node.id];
-      if (node.children) {
-        node.children.forEach(child => {
-          ids = [...ids, ...getAllIds(child)];
-        });
-      }
+      if (node.father) ids = [...ids, ...getAllIds(node.father)];
+      if (node.mother) ids = [...ids, ...getAllIds(node.mother)];
       return ids;
     };
     setExpandedNodes(new Set(getAllIds(familyData)));
@@ -1008,7 +1168,7 @@ export default function App() {
           The Powell Family
         </h1>
         <p className="text-stone-500 text-lg">
-          Ten Generations of Heritage
+          Heritage of Jordan Powell — Ten Generations
         </p>
       </header>
 
@@ -1043,14 +1203,15 @@ export default function App() {
         </div>
       </div>
 
-      {/* Pannable Family Tree */}
+      {/* Pannable Ancestry Tree */}
       <PannableCanvas zoom={zoom}>
-        <FamilyNode 
+        <AncestorNode 
           node={familyData}
           onSelectPerson={setSelectedPerson}
           selectedPerson={selectedPerson}
           expandedNodes={expandedNodes}
           toggleExpand={toggleExpand}
+          isRoot={true}
         />
       </PannableCanvas>
 
@@ -1064,6 +1225,10 @@ export default function App() {
       <div className="fixed bottom-4 left-4 z-40">
         <div className="flex items-center gap-4 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-600">
           <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 ring-1 ring-amber-400" />
+            <span>You</span>
+          </div>
+          <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-200 to-amber-400" />
             <span>Living</span>
           </div>
@@ -1071,16 +1236,12 @@ export default function App() {
             <div className="w-3 h-3 rounded-full bg-stone-300 border-2 border-stone-400" />
             <span>Deceased</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-rose-400">♥</span>
-            <span>Married</span>
-          </div>
         </div>
       </div>
 
       {/* Help Text */}
       <div className="fixed bottom-4 right-4 z-40 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-500">
-        Drag to pan • Click person for details • Click ▼ to expand
+        Drag to pan • Click person for details • Click ▼ to view ancestors
       </div>
     </div>
   );
