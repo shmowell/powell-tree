@@ -380,14 +380,14 @@ const familyData = {
   }
 };
 
-function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoot }) {
+function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded, hasParents, isRoot }) {
   const isDeceased = person.death;
   
   return (
     <div 
       onClick={(e) => {
         e.stopPropagation();
-        onClick(person);
+        onCardClick(person);
       }}
       className={`
         relative cursor-pointer transition-all duration-300 ease-out
@@ -436,19 +436,24 @@ function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoo
         </div>
         
         {hasParents && (
-          <div 
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onExpandClick();
+            }}
             className={`
               absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 
               rounded-full border-2 bg-white flex items-center justify-center
               text-xs font-bold transition-all duration-300
+              hover:scale-110 hover:shadow-md
               ${isExpanded 
                 ? 'border-amber-500 text-amber-600 rotate-180' 
-                : 'border-stone-300 text-stone-500'
+                : 'border-stone-300 text-stone-500 hover:border-amber-400 hover:text-amber-500'
               }
             `}
           >
             ▼
-          </div>
+          </button>
         )}
       </div>
     </div>
@@ -466,13 +471,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
   const motherRef = useRef(null);
   const [curvePath, setCurvePath] = useState('');
   const [svgSize, setSvgSize] = useState({ width: 0, height: 50 });
-
-  const handleClick = (person) => {
-    onSelectPerson(person);
-    if (hasParents && person.id === node.id) {
-      toggleExpand(node.id);
-    }
-  };
 
   // Calculate curve paths based on actual DOM positions
   useEffect(() => {
@@ -530,7 +528,8 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
     <div className="flex flex-col items-center" ref={containerRef}>
       <PersonCard 
         person={node} 
-        onClick={handleClick}
+        onCardClick={onSelectPerson}
+        onExpandClick={() => toggleExpand(node.id)}
         isSelected={selectedPerson?.id === node.id}
         isExpanded={isExpanded}
         hasParents={hasParents}
@@ -903,7 +902,7 @@ export default function App() {
 
       {/* Help Text */}
       <div className="fixed bottom-4 right-4 z-40 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-500">
-        Drag to pan • Click ▼ to view ancestors
+        Drag to pan • Click card for details • Click ▼ for ancestors
       </div>
     </div>
   );
