@@ -586,10 +586,34 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
 }
 
 function DetailPanel({ person, onClose }) {
+  const panelRef = useRef(null);
+  
+  // Close panel when clicking outside
+  useEffect(() => {
+    if (!person) return;
+    
+    const handleClickOutside = (e) => {
+      if (panelRef.current && !panelRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    
+    // Delay adding listener to prevent immediate close
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [person, onClose]);
+  
   if (!person) return null;
   
   return (
     <div 
+      ref={panelRef}
       className="fixed right-0 top-0 h-full w-80 bg-white/95 shadow-2xl border-l border-stone-200 p-6 overflow-y-auto z-50 animate-slideIn"
       style={{ backdropFilter: 'blur(20px)' }}
     >
