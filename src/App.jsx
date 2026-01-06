@@ -455,13 +455,54 @@ function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoo
   );
 }
 
-// Connector line component
-function VLine({ height = 24 }) {
-  return <div className="bg-stone-400" style={{ width: 2, height, flexShrink: 0 }} />;
-}
-
-function HLine({ width = 40 }) {
-  return <div className="bg-stone-400" style={{ height: 2, width, flexShrink: 0 }} />;
+// Connector line component using SVG curves
+function CurvedConnector({ hasBothParents }) {
+  // Dimensions
+  const width = hasBothParents ? 320 : 160;
+  const height = 50;
+  const midX = width / 2;
+  
+  // Control point for curve smoothness
+  const curveStrength = 25;
+  
+  if (hasBothParents) {
+    // Two curves: center-top to left-bottom and center-top to right-bottom
+    const leftX = 80;  // Where father branch is
+    const rightX = 240; // Where mother branch is
+    
+    return (
+      <svg width={width} height={height} className="overflow-visible">
+        {/* Curve to father (left) */}
+        <path
+          d={`M ${midX} 0 
+              C ${midX} ${curveStrength}, ${leftX} ${height - curveStrength}, ${leftX} ${height}`}
+          fill="none"
+          stroke="#a8a29e"
+          strokeWidth="2"
+        />
+        {/* Curve to mother (right) */}
+        <path
+          d={`M ${midX} 0 
+              C ${midX} ${curveStrength}, ${rightX} ${height - curveStrength}, ${rightX} ${height}`}
+          fill="none"
+          stroke="#a8a29e"
+          strokeWidth="2"
+        />
+      </svg>
+    );
+  } else {
+    // Single straight line down
+    return (
+      <svg width={40} height={height} className="overflow-visible">
+        <path
+          d={`M 20 0 L 20 ${height}`}
+          fill="none"
+          stroke="#a8a29e"
+          strokeWidth="2"
+        />
+      </svg>
+    );
+  }
 }
 
 function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
@@ -489,45 +530,28 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       
       {hasParents && isExpanded && (
         <>
-          {/* Vertical line down from person */}
-          <VLine />
+          {/* SVG curved connector */}
+          <CurvedConnector hasBothParents={hasBothParents} />
           
-          {/* Parents row with T-connector */}
-          <div className="flex items-start">
-            {/* Father branch */}
+          {/* Parents row */}
+          <div className="flex" style={{ gap: hasBothParents ? '80px' : '0' }}>
             {node.father && (
-              <div className="flex flex-col items-center">
-                {/* Connector: horizontal line going right (toward center) + vertical drop */}
-                <div className="flex items-start">
-                  <VLine />
-                  {hasBothParents && <HLine />}
-                </div>
-                <AncestryBranch
-                  node={node.father}
-                  onSelectPerson={onSelectPerson}
-                  selectedPerson={selectedPerson}
-                  expandedNodes={expandedNodes}
-                  toggleExpand={toggleExpand}
-                />
-              </div>
+              <AncestryBranch
+                node={node.father}
+                onSelectPerson={onSelectPerson}
+                selectedPerson={selectedPerson}
+                expandedNodes={expandedNodes}
+                toggleExpand={toggleExpand}
+              />
             )}
-            
-            {/* Mother branch */}
             {node.mother && (
-              <div className="flex flex-col items-center">
-                {/* Connector: horizontal line going left (toward center) + vertical drop */}
-                <div className="flex items-start">
-                  {hasBothParents && <HLine />}
-                  <VLine />
-                </div>
-                <AncestryBranch
-                  node={node.mother}
-                  onSelectPerson={onSelectPerson}
-                  selectedPerson={selectedPerson}
-                  expandedNodes={expandedNodes}
-                  toggleExpand={toggleExpand}
-                />
-              </div>
+              <AncestryBranch
+                node={node.mother}
+                onSelectPerson={onSelectPerson}
+                selectedPerson={selectedPerson}
+                expandedNodes={expandedNodes}
+                toggleExpand={toggleExpand}
+              />
             )}
           </div>
         </>
