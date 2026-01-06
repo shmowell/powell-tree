@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 
 // Ancestry data - tracking heritage of Jordan Powell
-// Structure: each person has father and mother (ancestors branch downward)
 const familyData = {
   id: 1,
   name: "Jordan Powell",
@@ -297,56 +296,6 @@ const familyData = {
                 birth: "1838",
                 death: "1916",
                 photo: "👴",
-                father: {
-                  id: 144,
-                  name: "Isaac Clarke",
-                  birth: "1810",
-                  death: "1888",
-                  photo: "👴",
-                  father: {
-                    id: 288,
-                    name: "Jacob Clarke",
-                    birth: "1782",
-                    death: "1860",
-                    photo: "👴",
-                    father: { id: 576, name: "Abraham Clarke", birth: "1754", death: "1832", photo: "👴" },
-                    mother: { id: 577, name: "Rebecca Stone", birth: "1758", death: "1836", photo: "👵" }
-                  },
-                  mother: {
-                    id: 289,
-                    name: "Deborah Marsh",
-                    birth: "1786",
-                    death: "1864",
-                    photo: "👵",
-                    father: { id: 578, name: "Benjamin Marsh", birth: "1758", death: "1836", photo: "👴" },
-                    mother: { id: 579, name: "Abigail Sawyer", birth: "1762", death: "1840", photo: "👵" }
-                  }
-                },
-                mother: {
-                  id: 145,
-                  name: "Rachel Hoffman",
-                  birth: "1814",
-                  death: "1892",
-                  photo: "👵",
-                  father: {
-                    id: 290,
-                    name: "Peter Hoffman",
-                    birth: "1786",
-                    death: "1864",
-                    photo: "👴",
-                    father: { id: 580, name: "Johann Hoffman", birth: "1758", death: "1836", photo: "👴" },
-                    mother: { id: 581, name: "Katarina Weber", birth: "1762", death: "1840", photo: "👵" }
-                  },
-                  mother: {
-                    id: 291,
-                    name: "Anna Schmidt",
-                    birth: "1790",
-                    death: "1868",
-                    photo: "👵",
-                    father: { id: 582, name: "Friedrich Schmidt", birth: "1762", death: "1840", photo: "👴" },
-                    mother: { id: 583, name: "Margarethe Braun", birth: "1766", death: "1844", photo: "👵" }
-                  }
-                }
               },
               mother: {
                 id: 73,
@@ -354,56 +303,6 @@ const familyData = {
                 birth: "1842",
                 death: "1920",
                 photo: "👵",
-                father: {
-                  id: 146,
-                  name: "Patrick Sullivan",
-                  birth: "1814",
-                  death: "1892",
-                  photo: "👴",
-                  father: {
-                    id: 292,
-                    name: "Sean Sullivan",
-                    birth: "1786",
-                    death: "1864",
-                    photo: "👴",
-                    father: { id: 584, name: "Liam Sullivan", birth: "1758", death: "1836", photo: "👴" },
-                    mother: { id: 585, name: "Brigid O'Connor", birth: "1762", death: "1840", photo: "👵" }
-                  },
-                  mother: {
-                    id: 293,
-                    name: "Siobhan Murphy",
-                    birth: "1790",
-                    death: "1868",
-                    photo: "👵",
-                    father: { id: 586, name: "Declan Murphy", birth: "1762", death: "1840", photo: "👴" },
-                    mother: { id: 587, name: "Aoife Byrne", birth: "1766", death: "1844", photo: "👵" }
-                  }
-                },
-                mother: {
-                  id: 147,
-                  name: "Nora Fitzgerald",
-                  birth: "1818",
-                  death: "1896",
-                  photo: "👵",
-                  father: {
-                    id: 294,
-                    name: "Michael Fitzgerald",
-                    birth: "1790",
-                    death: "1868",
-                    photo: "👴",
-                    father: { id: 588, name: "Padraig Fitzgerald", birth: "1762", death: "1840", photo: "👴" },
-                    mother: { id: 589, name: "Caitlin Walsh", birth: "1766", death: "1844", photo: "👵" }
-                  },
-                  mother: {
-                    id: 295,
-                    name: "Mary Gallagher",
-                    birth: "1794",
-                    death: "1872",
-                    photo: "👵",
-                    father: { id: 590, name: "Eamon Gallagher", birth: "1766", death: "1844", photo: "👴" },
-                    mother: { id: 591, name: "Eileen Doyle", birth: "1770", death: "1848", photo: "👵" }
-                  }
-                }
               }
             },
             mother: {
@@ -412,120 +311,6 @@ const familyData = {
               birth: "1870",
               death: "1948",
               photo: "👵",
-              father: {
-                id: 74,
-                name: "Giuseppe Moretti",
-                birth: "1842",
-                death: "1920",
-                photo: "👴",
-                father: {
-                  id: 148,
-                  name: "Antonio Moretti",
-                  birth: "1814",
-                  death: "1892",
-                  photo: "👴",
-                  father: {
-                    id: 296,
-                    name: "Marco Moretti",
-                    birth: "1786",
-                    death: "1864",
-                    photo: "👴",
-                    father: { id: 592, name: "Lorenzo Moretti", birth: "1758", death: "1836", photo: "👴" },
-                    mother: { id: 593, name: "Lucia Rossi", birth: "1762", death: "1840", photo: "👵" }
-                  },
-                  mother: {
-                    id: 297,
-                    name: "Francesca Bianchi",
-                    birth: "1790",
-                    death: "1868",
-                    photo: "👵",
-                    father: { id: 594, name: "Giovanni Bianchi", birth: "1762", death: "1840", photo: "👴" },
-                    mother: { id: 595, name: "Maria Romano", birth: "1766", death: "1844", photo: "👵" }
-                  }
-                },
-                mother: {
-                  id: 149,
-                  name: "Sofia Russo",
-                  birth: "1818",
-                  death: "1896",
-                  photo: "👵",
-                  father: {
-                    id: 298,
-                    name: "Pietro Russo",
-                    birth: "1790",
-                    death: "1868",
-                    photo: "👴",
-                    father: { id: 596, name: "Salvatore Russo", birth: "1762", death: "1840", photo: "👴" },
-                    mother: { id: 597, name: "Carmela Esposito", birth: "1766", death: "1844", photo: "👵" }
-                  },
-                  mother: {
-                    id: 299,
-                    name: "Angela Colombo",
-                    birth: "1794",
-                    death: "1872",
-                    photo: "👵",
-                    father: { id: 598, name: "Vittorio Colombo", birth: "1766", death: "1844", photo: "👴" },
-                    mother: { id: 599, name: "Teresa Conti", birth: "1770", death: "1848", photo: "👵" }
-                  }
-                }
-              },
-              mother: {
-                id: 75,
-                name: "Caterina Ferrari",
-                birth: "1846",
-                death: "1924",
-                photo: "👵",
-                father: {
-                  id: 150,
-                  name: "Alessandro Ferrari",
-                  birth: "1818",
-                  death: "1896",
-                  photo: "👴",
-                  father: {
-                    id: 300,
-                    name: "Giacomo Ferrari",
-                    birth: "1790",
-                    death: "1868",
-                    photo: "👴",
-                    father: { id: 600, name: "Paolo Ferrari", birth: "1762", death: "1840", photo: "👴" },
-                    mother: { id: 601, name: "Elena Ricci", birth: "1766", death: "1844", photo: "👵" }
-                  },
-                  mother: {
-                    id: 301,
-                    name: "Giulia Martini",
-                    birth: "1794",
-                    death: "1872",
-                    photo: "👵",
-                    father: { id: 602, name: "Roberto Martini", birth: "1766", death: "1844", photo: "👴" },
-                    mother: { id: 603, name: "Chiara Gallo", birth: "1770", death: "1848", photo: "👵" }
-                  }
-                },
-                mother: {
-                  id: 151,
-                  name: "Elisabetta Lombardi",
-                  birth: "1822",
-                  death: "1900",
-                  photo: "👵",
-                  father: {
-                    id: 302,
-                    name: "Stefano Lombardi",
-                    birth: "1794",
-                    death: "1872",
-                    photo: "👴",
-                    father: { id: 604, name: "Massimo Lombardi", birth: "1766", death: "1844", photo: "👴" },
-                    mother: { id: 605, name: "Beatrice Fontana", birth: "1770", death: "1848", photo: "👵" }
-                  },
-                  mother: {
-                    id: 303,
-                    name: "Maddalena Greco",
-                    birth: "1798",
-                    death: "1876",
-                    photo: "👵",
-                    father: { id: 606, name: "Domenico Greco", birth: "1770", death: "1848", photo: "👴" },
-                    mother: { id: 607, name: "Rosalia Leone", birth: "1774", death: "1852", photo: "👵" }
-                  }
-                }
-              }
             }
           },
           mother: {
@@ -534,20 +319,6 @@ const familyData = {
             birth: "1898",
             death: "1980",
             photo: "👵",
-            father: {
-              id: 38,
-              name: "Charles Montgomery",
-              birth: "1870",
-              death: "1948",
-              photo: "👴",
-            },
-            mother: {
-              id: 39,
-              name: "Virginia Hartwell",
-              birth: "1874",
-              death: "1952",
-              photo: "👵",
-            }
           }
         }
       },
@@ -562,20 +333,8 @@ const familyData = {
           birth: "1920",
           death: "2005",
           photo: "👴",
-          father: {
-            id: 20,
-            name: "James Williams",
-            birth: "1892",
-            death: "1970",
-            photo: "👴",
-          },
-          mother: {
-            id: 21,
-            name: "Helen Foster",
-            birth: "1896",
-            death: "1978",
-            photo: "👵",
-          }
+          father: { id: 20, name: "James Williams", birth: "1892", death: "1970", photo: "👴" },
+          mother: { id: 21, name: "Helen Foster", birth: "1896", death: "1978", photo: "👵" }
         },
         mother: {
           id: 11,
@@ -583,20 +342,8 @@ const familyData = {
           birth: "1924",
           death: "2012",
           photo: "👵",
-          father: {
-            id: 22,
-            name: "Patrick O'Brien",
-            birth: "1896",
-            death: "1974",
-            photo: "👴",
-          },
-          mother: {
-            id: 23,
-            name: "Kathleen Brennan",
-            birth: "1900",
-            death: "1982",
-            photo: "👵",
-          }
+          father: { id: 22, name: "Patrick O'Brien", birth: "1896", death: "1974", photo: "👴" },
+          mother: { id: 23, name: "Kathleen Brennan", birth: "1900", death: "1982", photo: "👵" }
         }
       }
     },
@@ -616,20 +363,8 @@ const familyData = {
           birth: "1920",
           death: "2008",
           photo: "👴",
-          father: {
-            id: 24,
-            name: "Liang Chen",
-            birth: "1892",
-            death: "1970",
-            photo: "👴",
-          },
-          mother: {
-            id: 25,
-            name: "Mei Lin Zhang",
-            birth: "1896",
-            death: "1978",
-            photo: "👵",
-          }
+          father: { id: 24, name: "Liang Chen", birth: "1892", death: "1970", photo: "👴" },
+          mother: { id: 25, name: "Mei Lin Zhang", birth: "1896", death: "1978", photo: "👵" }
         },
         mother: {
           id: 13,
@@ -637,20 +372,8 @@ const familyData = {
           birth: "1924",
           death: "2015",
           photo: "👵",
-          father: {
-            id: 26,
-            name: "Jun Wang",
-            birth: "1896",
-            death: "1974",
-            photo: "👴",
-          },
-          mother: {
-            id: 27,
-            name: "Xiu Li",
-            birth: "1900",
-            death: "1982",
-            photo: "👵",
-          }
+          father: { id: 26, name: "Jun Wang", birth: "1896", death: "1974", photo: "👴" },
+          mother: { id: 27, name: "Xiu Li", birth: "1900", death: "1982", photo: "👵" }
         }
       },
       mother: {
@@ -664,20 +387,8 @@ const familyData = {
           birth: "1924",
           death: "2010",
           photo: "👴",
-          father: {
-            id: 28,
-            name: "Sung Park",
-            birth: "1896",
-            death: "1974",
-            photo: "👴",
-          },
-          mother: {
-            id: 29,
-            name: "Young Kim",
-            birth: "1900",
-            death: "1982",
-            photo: "👵",
-          }
+          father: { id: 28, name: "Sung Park", birth: "1896", death: "1974", photo: "👴" },
+          mother: { id: 29, name: "Young Kim", birth: "1900", death: "1982", photo: "👵" }
         },
         mother: {
           id: 15,
@@ -685,20 +396,8 @@ const familyData = {
           birth: "1928",
           death: "2018",
           photo: "👵",
-          father: {
-            id: 30,
-            name: "Min Lee",
-            birth: "1900",
-            death: "1978",
-            photo: "👴",
-          },
-          mother: {
-            id: 31,
-            name: "Soo Choi",
-            birth: "1904",
-            death: "1986",
-            photo: "👵",
-          }
+          father: { id: 30, name: "Min Lee", birth: "1900", death: "1978", photo: "👴" },
+          mother: { id: 31, name: "Soo Choi", birth: "1904", death: "1986", photo: "👵" }
         }
       }
     }
@@ -780,100 +479,11 @@ function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoo
   );
 }
 
-function ParentsContainer({ father, mother, onSelectPerson, selectedPerson, expandedNodes, toggleExpand }) {
-  const containerRef = useRef(null);
-  const [linePositions, setLinePositions] = useState({ left: 0, right: 0 });
-
-  useEffect(() => {
-    const updateLines = () => {
-      if (containerRef.current) {
-        const container = containerRef.current;
-        const childNodes = container.querySelectorAll(':scope > div');
-        
-        if (childNodes.length === 2) {
-          const containerRect = container.getBoundingClientRect();
-          const centers = [];
-          
-          childNodes.forEach((child) => {
-            const rect = child.getBoundingClientRect();
-            const center = rect.left + rect.width / 2 - containerRect.left;
-            centers.push(center);
-          });
-          
-          setLinePositions({
-            left: centers[0],
-            right: centers[1]
-          });
-        }
-      }
-    };
-
-    updateLines();
-    window.addEventListener('resize', updateLines);
-    const timeout = setTimeout(updateLines, 100);
-    
-    return () => {
-      window.removeEventListener('resize', updateLines);
-      clearTimeout(timeout);
-    };
-  }, [father, mother, expandedNodes]);
-
-  return (
-    <div className="relative mt-8">
-      {/* Vertical line from child to parents */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-6 -mt-6 bg-stone-400" />
-      
-      {/* Horizontal connecting line between parents */}
-      {linePositions.right > linePositions.left && (
-        <div 
-          className="absolute top-0 h-0.5 -mt-2 bg-stone-400"
-          style={{
-            left: `${linePositions.left}px`,
-            width: `${linePositions.right - linePositions.left}px`,
-          }}
-        />
-      )}
-      
-      {/* Parents */}
-      <div ref={containerRef} className="flex gap-6 items-start justify-center">
-        {father && (
-          <div className="relative flex flex-col items-center">
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-4 bg-stone-400" />
-            <div className="pt-4">
-              <AncestorNode 
-                node={father}
-                onSelectPerson={onSelectPerson}
-                selectedPerson={selectedPerson}
-                expandedNodes={expandedNodes}
-                toggleExpand={toggleExpand}
-                side="father"
-              />
-            </div>
-          </div>
-        )}
-        {mother && (
-          <div className="relative flex flex-col items-center">
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0.5 h-4 bg-stone-400" />
-            <div className="pt-4">
-              <AncestorNode 
-                node={mother}
-                onSelectPerson={onSelectPerson}
-                selectedPerson={selectedPerson}
-                expandedNodes={expandedNodes}
-                toggleExpand={toggleExpand}
-                side="mother"
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function AncestorNode({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, side, isRoot = false }) {
+function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
   const hasParents = node.father || node.mother;
   const isExpanded = expandedNodes.has(node.id);
+  const containerRef = useRef(null);
+  const [lineWidth, setLineWidth] = useState(0);
 
   const handleClick = (person) => {
     onSelectPerson(person);
@@ -882,8 +492,40 @@ function AncestorNode({ node, onSelectPerson, selectedPerson, expandedNodes, tog
     }
   };
 
+  // Calculate line width based on actual rendered parent positions
+  useEffect(() => {
+    if (containerRef.current && isExpanded && hasParents) {
+      const updateLineWidth = () => {
+        const container = containerRef.current;
+        if (!container) return;
+        
+        const parentCards = container.querySelectorAll(':scope > .parent-wrapper');
+        if (parentCards.length === 2) {
+          const first = parentCards[0].getBoundingClientRect();
+          const second = parentCards[1].getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          const firstCenter = first.left + first.width / 2 - containerRect.left;
+          const secondCenter = second.left + second.width / 2 - containerRect.left;
+          
+          setLineWidth(secondCenter - firstCenter);
+        }
+      };
+      
+      updateLineWidth();
+      const timeout = setTimeout(updateLineWidth, 50);
+      window.addEventListener('resize', updateLineWidth);
+      
+      return () => {
+        clearTimeout(timeout);
+        window.removeEventListener('resize', updateLineWidth);
+      };
+    }
+  }, [isExpanded, hasParents, expandedNodes]);
+
   return (
-    <div className="flex flex-col items-center animate-fadeIn">
+    <div className="flex flex-col items-center">
+      {/* Current Person */}
       <PersonCard 
         person={node} 
         onClick={handleClick}
@@ -893,15 +535,57 @@ function AncestorNode({ node, onSelectPerson, selectedPerson, expandedNodes, tog
         isRoot={isRoot}
       />
       
+      {/* Parents Section */}
       {hasParents && isExpanded && (
-        <ParentsContainer
-          father={node.father}
-          mother={node.mother}
-          onSelectPerson={onSelectPerson}
-          selectedPerson={selectedPerson}
-          expandedNodes={expandedNodes}
-          toggleExpand={toggleExpand}
-        />
+        <div className="flex flex-col items-center mt-6">
+          {/* Vertical line down from person */}
+          <div className="w-0.5 h-6 bg-stone-400" />
+          
+          {/* Horizontal connector and vertical drops to parents */}
+          <div className="relative" ref={containerRef}>
+            {/* Horizontal line connecting parents */}
+            {node.father && node.mother && lineWidth > 0 && (
+              <div 
+                className="absolute top-0 h-0.5 bg-stone-400"
+                style={{
+                  left: '50%',
+                  width: `${lineWidth}px`,
+                  transform: 'translateX(-50%)'
+                }}
+              />
+            )}
+            
+            {/* Parents row */}
+            <div className="flex gap-8 items-start">
+              {node.father && (
+                <div className="parent-wrapper flex flex-col items-center">
+                  {/* Vertical line to father */}
+                  <div className="w-0.5 h-6 bg-stone-400" />
+                  <AncestryBranch
+                    node={node.father}
+                    onSelectPerson={onSelectPerson}
+                    selectedPerson={selectedPerson}
+                    expandedNodes={expandedNodes}
+                    toggleExpand={toggleExpand}
+                  />
+                </div>
+              )}
+              {node.mother && (
+                <div className="parent-wrapper flex flex-col items-center">
+                  {/* Vertical line to mother */}
+                  <div className="w-0.5 h-6 bg-stone-400" />
+                  <AncestryBranch
+                    node={node.mother}
+                    onSelectPerson={onSelectPerson}
+                    selectedPerson={selectedPerson}
+                    expandedNodes={expandedNodes}
+                    toggleExpand={toggleExpand}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -994,13 +678,10 @@ function PannableCanvas({ children, zoom }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [hasMoved, setHasMoved] = useState(false);
 
   const handleMouseDown = (e) => {
-    if (e.target.closest('[data-card]') || e.target.closest('button')) return;
-    
+    if (e.target.closest('button')) return;
     setIsDragging(true);
-    setHasMoved(false);
     setDragStart({
       x: e.clientX - position.x,
       y: e.clientY - position.y
@@ -1009,14 +690,10 @@ function PannableCanvas({ children, zoom }) {
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    const newX = e.clientX - dragStart.x;
-    const newY = e.clientY - dragStart.y;
-    
-    if (Math.abs(newX - position.x) > 3 || Math.abs(newY - position.y) > 3) {
-      setHasMoved(true);
-    }
-    
-    setPosition({ x: newX, y: newY });
+    setPosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
   };
 
   const handleMouseUp = () => {
@@ -1024,11 +701,9 @@ function PannableCanvas({ children, zoom }) {
   };
 
   const handleTouchStart = (e) => {
-    if (e.target.closest('[data-card]') || e.target.closest('button')) return;
-    
+    if (e.target.closest('button')) return;
     const touch = e.touches[0];
     setIsDragging(true);
-    setHasMoved(false);
     setDragStart({
       x: touch.clientX - position.x,
       y: touch.clientY - position.y
@@ -1038,18 +713,10 @@ function PannableCanvas({ children, zoom }) {
   const handleTouchMove = (e) => {
     if (!isDragging) return;
     const touch = e.touches[0];
-    const newX = touch.clientX - dragStart.x;
-    const newY = touch.clientY - dragStart.y;
-    
-    if (Math.abs(newX - position.x) > 3 || Math.abs(newY - position.y) > 3) {
-      setHasMoved(true);
-    }
-    
-    setPosition({ x: newX, y: newY });
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
+    setPosition({
+      x: touch.clientX - dragStart.x,
+      y: touch.clientY - dragStart.y
+    });
   };
 
   const resetPosition = () => {
@@ -1057,12 +724,12 @@ function PannableCanvas({ children, zoom }) {
   };
 
   useEffect(() => {
-    const handleMouseUpGlobal = () => setIsDragging(false);
-    window.addEventListener('mouseup', handleMouseUpGlobal);
-    window.addEventListener('touchend', handleMouseUpGlobal);
+    const handleUp = () => setIsDragging(false);
+    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('touchend', handleUp);
     return () => {
-      window.removeEventListener('mouseup', handleMouseUpGlobal);
-      window.removeEventListener('touchend', handleMouseUpGlobal);
+      window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('touchend', handleUp);
     };
   }, []);
 
@@ -1077,7 +744,7 @@ function PannableCanvas({ children, zoom }) {
       onMouseLeave={handleMouseUp}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onTouchEnd={handleMouseUp}
     >
       <div 
         className="absolute inset-0 flex justify-center items-start pt-8"
@@ -1168,7 +835,7 @@ export default function App() {
           The Powell Family
         </h1>
         <p className="text-stone-500 text-lg">
-          Heritage of Jordan Powell — Ten Generations
+          Ancestry of Jordan Powell
         </p>
       </header>
 
@@ -1205,7 +872,7 @@ export default function App() {
 
       {/* Pannable Ancestry Tree */}
       <PannableCanvas zoom={zoom}>
-        <AncestorNode 
+        <AncestryBranch 
           node={familyData}
           onSelectPerson={setSelectedPerson}
           selectedPerson={selectedPerson}
@@ -1226,7 +893,7 @@ export default function App() {
         <div className="flex items-center gap-4 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-600">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 ring-1 ring-amber-400" />
-            <span>You</span>
+            <span>Subject</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-200 to-amber-400" />
@@ -1241,7 +908,7 @@ export default function App() {
 
       {/* Help Text */}
       <div className="fixed bottom-4 right-4 z-40 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-500">
-        Drag to pan • Click person for details • Click ▼ to view ancestors
+        Drag to pan • Click ▼ to view ancestors
       </div>
     </div>
   );
