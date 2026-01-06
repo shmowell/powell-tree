@@ -290,36 +290,12 @@ const familyData = {
               birth: "1866",
               death: "1944",
               photo: "👴",
-              father: {
-                id: 72,
-                name: "Samuel Clarke",
-                birth: "1838",
-                death: "1916",
-                photo: "👴",
-              },
-              mother: {
-                id: 73,
-                name: "Emma Sullivan",
-                birth: "1842",
-                death: "1920",
-                photo: "👵",
-              }
+              father: { id: 72, name: "Samuel Clarke", birth: "1838", death: "1916", photo: "👴" },
+              mother: { id: 73, name: "Emma Sullivan", birth: "1842", death: "1920", photo: "👵" }
             },
-            mother: {
-              id: 37,
-              name: "Rose Moretti",
-              birth: "1870",
-              death: "1948",
-              photo: "👵",
-            }
+            mother: { id: 37, name: "Rose Moretti", birth: "1870", death: "1948", photo: "👵" }
           },
-          mother: {
-            id: 19,
-            name: "Edith Montgomery",
-            birth: "1898",
-            death: "1980",
-            photo: "👵",
-          }
+          mother: { id: 19, name: "Edith Montgomery", birth: "1898", death: "1980", photo: "👵" }
         }
       },
       mother: {
@@ -415,7 +391,7 @@ function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoo
       }}
       className={`
         relative cursor-pointer transition-all duration-300 ease-out
-        ${isSelected ? 'scale-105 z-10' : 'hover:scale-102'}
+        ${isSelected ? 'scale-105 z-10' : 'hover:scale-105'}
       `}
     >
       <div 
@@ -479,11 +455,19 @@ function PersonCard({ person, onClick, isSelected, isExpanded, hasParents, isRoo
   );
 }
 
+// Connector line component
+function VLine({ height = 24 }) {
+  return <div className="bg-stone-400" style={{ width: 2, height, flexShrink: 0 }} />;
+}
+
+function HLine({ width = 40 }) {
+  return <div className="bg-stone-400" style={{ height: 2, width, flexShrink: 0 }} />;
+}
+
 function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
   const hasParents = node.father || node.mother;
+  const hasBothParents = node.father && node.mother;
   const isExpanded = expandedNodes.has(node.id);
-  const containerRef = useRef(null);
-  const [lineWidth, setLineWidth] = useState(0);
 
   const handleClick = (person) => {
     onSelectPerson(person);
@@ -492,40 +476,8 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
     }
   };
 
-  // Calculate line width based on actual rendered parent positions
-  useEffect(() => {
-    if (containerRef.current && isExpanded && hasParents) {
-      const updateLineWidth = () => {
-        const container = containerRef.current;
-        if (!container) return;
-        
-        const parentCards = container.querySelectorAll(':scope > .parent-wrapper');
-        if (parentCards.length === 2) {
-          const first = parentCards[0].getBoundingClientRect();
-          const second = parentCards[1].getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
-          
-          const firstCenter = first.left + first.width / 2 - containerRect.left;
-          const secondCenter = second.left + second.width / 2 - containerRect.left;
-          
-          setLineWidth(secondCenter - firstCenter);
-        }
-      };
-      
-      updateLineWidth();
-      const timeout = setTimeout(updateLineWidth, 50);
-      window.addEventListener('resize', updateLineWidth);
-      
-      return () => {
-        clearTimeout(timeout);
-        window.removeEventListener('resize', updateLineWidth);
-      };
-    }
-  }, [isExpanded, hasParents, expandedNodes]);
-
   return (
     <div className="flex flex-col items-center">
-      {/* Current Person */}
       <PersonCard 
         person={node} 
         onClick={handleClick}
@@ -535,57 +487,50 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
         isRoot={isRoot}
       />
       
-      {/* Parents Section */}
       {hasParents && isExpanded && (
-        <div className="flex flex-col items-center mt-6">
+        <>
           {/* Vertical line down from person */}
-          <div className="w-0.5 h-6 bg-stone-400" />
+          <VLine />
           
-          {/* Horizontal connector and vertical drops to parents */}
-          <div className="relative" ref={containerRef}>
-            {/* Horizontal line connecting parents */}
-            {node.father && node.mother && lineWidth > 0 && (
-              <div 
-                className="absolute top-0 h-0.5 bg-stone-400"
-                style={{
-                  left: '50%',
-                  width: `${lineWidth}px`,
-                  transform: 'translateX(-50%)'
-                }}
-              />
+          {/* Parents row with T-connector */}
+          <div className="flex items-start">
+            {/* Father branch */}
+            {node.father && (
+              <div className="flex flex-col items-center">
+                {/* Connector: horizontal line going right (toward center) + vertical drop */}
+                <div className="flex items-start">
+                  <VLine />
+                  {hasBothParents && <HLine />}
+                </div>
+                <AncestryBranch
+                  node={node.father}
+                  onSelectPerson={onSelectPerson}
+                  selectedPerson={selectedPerson}
+                  expandedNodes={expandedNodes}
+                  toggleExpand={toggleExpand}
+                />
+              </div>
             )}
             
-            {/* Parents row */}
-            <div className="flex gap-8 items-start">
-              {node.father && (
-                <div className="parent-wrapper flex flex-col items-center">
-                  {/* Vertical line to father */}
-                  <div className="w-0.5 h-6 bg-stone-400" />
-                  <AncestryBranch
-                    node={node.father}
-                    onSelectPerson={onSelectPerson}
-                    selectedPerson={selectedPerson}
-                    expandedNodes={expandedNodes}
-                    toggleExpand={toggleExpand}
-                  />
+            {/* Mother branch */}
+            {node.mother && (
+              <div className="flex flex-col items-center">
+                {/* Connector: horizontal line going left (toward center) + vertical drop */}
+                <div className="flex items-start">
+                  {hasBothParents && <HLine />}
+                  <VLine />
                 </div>
-              )}
-              {node.mother && (
-                <div className="parent-wrapper flex flex-col items-center">
-                  {/* Vertical line to mother */}
-                  <div className="w-0.5 h-6 bg-stone-400" />
-                  <AncestryBranch
-                    node={node.mother}
-                    onSelectPerson={onSelectPerson}
-                    selectedPerson={selectedPerson}
-                    expandedNodes={expandedNodes}
-                    toggleExpand={toggleExpand}
-                  />
-                </div>
-              )}
-            </div>
+                <AncestryBranch
+                  node={node.mother}
+                  onSelectPerson={onSelectPerson}
+                  selectedPerson={selectedPerson}
+                  expandedNodes={expandedNodes}
+                  toggleExpand={toggleExpand}
+                />
+              </div>
+            )}
           </div>
-        </div>
+        </>
       )}
     </div>
   );
@@ -747,7 +692,7 @@ function PannableCanvas({ children, zoom }) {
       onTouchEnd={handleMouseUp}
     >
       <div 
-        className="absolute inset-0 flex justify-center items-start pt-8"
+        className="flex justify-center items-start pt-8"
         style={{ 
           transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
           transformOrigin: 'top center',
