@@ -5,7 +5,8 @@
 React-based family tree visualization for the Powell family with 4,915 individuals from GEDCOM data. 4 family members can explore their ancestry through an interactive web interface.
 
 **Live URL:** Deployed on Railway (auto-deploys from GitHub)
-**Tech Stack:** React 18, Vite, Tailwind CSS, GEDCOM parser
+**Tech Stack:** React 18, Vite, Tailwind CSS, react-d3-tree, React Flow, dagre, GEDCOM parser
+**Current Implementation:** Horizontal tree with dual visualization options (react-d3-tree & React Flow)
 
 ---
 
@@ -38,10 +39,10 @@ git checkout -b feature/descriptive-name
 
 #### Step 3: Read Existing Code
 
-- Review [CLAUDE_CODE_HANDOVER.md](docs/CLAUDE_CODE_HANDOVER.md) for architecture
-- Check [TECHNICAL_IMPLEMENTATION.md](docs/TECHNICAL_IMPLEMENTATION.md) for implementation patterns
-- Review [UI_UX_RESEARCH.md](docs/UI_UX_RESEARCH.md) for design decisions
-- Read related source files
+- Review [REACT_FLOW_VS_D3_TREE.md](docs/REACT_FLOW_VS_D3_TREE.md) for tree implementation comparison
+- Check [TESTING_BOTH_IMPLEMENTATIONS.md](docs/TESTING_BOTH_IMPLEMENTATIONS.md) for testing guide
+- Review [SESSION_HANDOFF_HORIZONTAL_TREE.md](docs/SESSION_HANDOFF_HORIZONTAL_TREE.md) for implementation notes
+- Read related source files (App.jsx for react-d3-tree, AppReactFlow.jsx for React Flow)
 
 #### Step 4: Implementation
 
@@ -91,19 +92,26 @@ git checkout -b feature/descriptive-name
 ```
 powell-tree/
 ├── public/
-│   └── family.ged              # GEDCOM data (4,915 individuals)
+│   ├── family.ged              # GEDCOM data (4,915 individuals)
+│   └── tree.svg                # Favicon
 ├── src/
-│   ├── App.jsx                 # Main component with state management
-│   ├── components/             # Feature components (create as needed)
+│   ├── components/
+│   │   ├── SearchBar.jsx       # Fuzzy search by name
+│   │   ├── Breadcrumbs.jsx     # Ancestry path navigation
+│   │   └── GenerationControl.jsx # Depth control widget
+│   ├── App.jsx                 # react-d3-tree implementation (default)
+│   ├── AppReactFlow.jsx        # React Flow implementation (enhanced)
 │   ├── gedcomParser.js         # GEDCOM parsing utilities
-│   ├── main.jsx                # React entry point
-│   └── index.css               # Tailwind imports
+│   ├── main.jsx                # Entry point (toggle implementations here)
+│   └── index.css               # Global styles
 ├── docs/
-│   ├── CLAUDE_CODE_HANDOVER.md # Architecture documentation
-│   ├── TECHNICAL_IMPLEMENTATION.md # Implementation examples
-│   ├── UI_UX_RESEARCH.md       # UX research and recommendations
-│   └── PHASE1_SPEC.md          # Phase 1 feature specification
-├── claude.md                   # This file - Claude Code instructions
+│   ├── REACT_FLOW_VS_D3_TREE.md # Comparison of both implementations
+│   ├── TESTING_BOTH_IMPLEMENTATIONS.md # Testing guide
+│   ├── SESSION_HANDOFF_HORIZONTAL_TREE.md # Implementation notes
+│   ├── HORIZONTAL_TREE_SPEC.md # Horizontal layout specification
+│   └── PHASE2_SPEC.md          # Future feature specifications
+├── CLAUDE.md                   # This file - Claude Code instructions
+├── README.md                   # User-facing documentation
 ├── index.html
 ├── package.json
 ├── vite.config.js
@@ -111,6 +119,71 @@ powell-tree/
 ├── postcss.config.js
 └── railway.json                # Railway deployment config
 ```
+
+---
+
+## Dual Tree Implementation
+
+The project includes **two complete implementations** of the horizontal family tree:
+
+### 1. react-d3-tree (Default) - `src/App.jsx`
+
+**When to use:**
+
+- Simpler codebase maintenance
+- Smaller bundle size preferred
+- Users view small to medium trees (< 200 nodes)
+
+**Features:**
+
+- Purpose-built for hierarchical trees
+- Built-in horizontal orientation
+- Step connector lines
+- ~252 KB bundle size
+
+### 2. React Flow (Enhanced) - `src/AppReactFlow.jsx`
+
+**When to use:**
+
+- Need professional UX features (minimap, controls)
+- Users explore very large trees (500+ nodes)
+- Want best performance at scale
+
+**Features:**
+
+- Professional zoom/pan controls widget
+- Minimap for navigation
+- Dot grid background
+- Dagre layout algorithm
+- ~342 KB bundle size (+90 KB vs react-d3-tree)
+
+### Switching Between Implementations
+
+Edit `src/main.jsx` line 9:
+
+```javascript
+const USE_REACT_FLOW = true;   // Use React Flow version
+const USE_REACT_FLOW = false;  // Use react-d3-tree version (default)
+```
+
+### Implementation Details
+
+Both implementations share:
+
+- Same data structure from `gedcomParser.js`
+- Same component designs (SearchBar, Breadcrumbs, GenerationControl)
+- Same features (search, breadcrumbs, expand/collapse, generation control)
+- Same warm amber/stone color palette
+
+**Key Differences:**
+
+- **App.jsx** converts tree to react-d3-tree format with `convertToD3TreeFormat()`
+- **AppReactFlow.jsx** converts to nodes/edges format with `convertTreeToNodesAndEdges()` then applies dagre layout
+
+**Documentation:**
+
+- [REACT_FLOW_VS_D3_TREE.md](docs/REACT_FLOW_VS_D3_TREE.md) - Detailed comparison
+- [TESTING_BOTH_IMPLEMENTATIONS.md](docs/TESTING_BOTH_IMPLEMENTATIONS.md) - Testing guide
 
 ---
 
