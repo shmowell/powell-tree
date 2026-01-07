@@ -91,7 +91,7 @@ function convertTreeToNodesAndEdges(treeNode, expandedNodes, maxDepth, depth = 0
       target: treeNode.id,
       type: 'step',  // PERFORMANCE: step is faster than smoothstep
       animated: false,
-      style: { stroke: '#a8a29e', strokeWidth: 2 },
+      style: { stroke: '#a89968', strokeWidth: 2.5, opacity: 0.7 },  // Heritage gold border color
     });
   }
 
@@ -146,40 +146,55 @@ const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
       >
         <div
           className={`
-            relative px-4 py-3 rounded-2xl border-2 transition-all duration-300
+            relative px-4 py-3 rounded-xl border-2 transition-all duration-300
             ${data.isRoot
-              ? 'border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 shadow-lg shadow-amber-200/50'
+              ? 'bg-gradient-to-br from-[#faf5e9] to-[#f5f1e8] shadow-lg border-[#d97706]'
               : selected
-                ? 'border-amber-600 bg-amber-50 shadow-xl shadow-amber-200/50'
-                : 'border-stone-300 bg-white/90 hover:border-amber-400 hover:shadow-lg'
+                ? 'bg-[#fffef9] border-[#2d5016] shadow-xl'
+                : 'border-[#d4c5a9] bg-[#fffef9]/95 hover:border-[#4a7c2c] hover:shadow-lg'
             }
-            ${isDeceased && !data.isRoot ? 'opacity-80' : ''}
+            ${isDeceased && !data.isRoot ? 'opacity-75' : ''}
           `}
           style={{
             backdropFilter: 'blur(8px)',
             minWidth: '200px',
+            boxShadow: data.isRoot
+              ? '0 4px 6px rgba(124, 45, 18, 0.15), 0 2px 4px rgba(124, 45, 18, 0.1)'
+              : selected
+                ? '0 8px 12px rgba(45, 80, 22, 0.2), 0 4px 6px rgba(45, 80, 22, 0.15)'
+                : undefined,
           }}
         >
         {isDeceased && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-stone-400 border-2 border-white" />
+          <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#7c2d12] border-2 border-[#fffef9]"
+            title="Deceased"
+            style={{
+              boxShadow: '0 2px 4px rgba(124, 45, 18, 0.3)'
+            }}
+          />
         )}
 
         <div className="flex items-center gap-3">
           <div
-            className={`text-2xl w-10 h-10 rounded-full flex items-center justify-center ${data.isRoot ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
+            className={`text-2xl w-10 h-10 rounded-full flex items-center justify-center ${data.isRoot ? 'ring-2 ring-[#d97706] ring-offset-2 ring-offset-[#faf8f3]' : ''}`}
             style={{
               background: data.isRoot
-                ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
-                : 'linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)',
+                ? 'linear-gradient(135deg, #d97706 0%, #b45309 100%)'
+                : 'linear-gradient(135deg, #e3d5c0 0%, #d4c5a9 100%)',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
             {data.photo}
           </div>
           <div className="text-left">
-            <div className="font-semibold text-stone-800 leading-tight font-display text-sm">
+            <div className="font-semibold text-[#1c1917] leading-tight text-sm"
+              style={{ fontFamily: 'EB Garamond, Lora, Georgia, serif' }}
+            >
               {data.name}
             </div>
-            <div className="text-xs text-stone-500 mt-0.5">
+            <div className="text-xs text-[#78716c] mt-0.5"
+              style={{ fontFamily: 'EB Garamond, Georgia, serif' }}
+            >
               {data.birth}{data.death ? ` — ${data.death}` : ''}
             </div>
           </div>
@@ -195,12 +210,12 @@ const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
             }}
             className={`
               absolute -right-2 top-1/2 -translate-y-1/2 w-6 h-6
-              rounded-full border-2 bg-white flex items-center justify-center
+              rounded-full border-2 flex items-center justify-center
               text-xs font-bold transition-all duration-300
               hover:scale-110 hover:shadow-md
               ${data.isExpanded
-                ? 'border-amber-500 text-amber-600'
-                : 'border-stone-300 text-stone-500 hover:border-amber-400 hover:text-amber-500'
+                ? 'border-[#2d5016] text-[#2d5016] bg-[#faf5e9]'
+                : 'border-[#d4c5a9] text-[#78716c] bg-[#fffef9] hover:border-[#4a7c2c] hover:text-[#2d5016]'
               }
             `}
           >
@@ -546,18 +561,17 @@ export default function AppReactFlow() {
     <div className="h-screen flex flex-col relative overflow-hidden"
       style={{
         background: `
-          radial-gradient(ellipse at top, #fefce8 0%, transparent 50%),
-          radial-gradient(ellipse at bottom right, #fff7ed 0%, transparent 50%),
-          radial-gradient(ellipse at bottom left, #fef3c7 0%, transparent 50%),
-          linear-gradient(180deg, #fffbeb 0%, #fef9c3 50%, #fef3c7 100%)
+          radial-gradient(ellipse at top left, rgba(212, 197, 169, 0.15) 0%, transparent 40%),
+          radial-gradient(ellipse at bottom right, rgba(168, 153, 104, 0.1) 0%, transparent 40%),
+          linear-gradient(135deg, #faf8f3 0%, #f5f1e8 50%, #faf8f3 100%)
         `,
       }}
     >
-      {/* Decorative Pattern */}
+      {/* Heritage Ornamental Pattern */}
       <div
-        className="absolute inset-0 opacity-30 pointer-events-none"
+        className="absolute inset-0 opacity-15 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a574' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232d5016' fill-opacity='0.18'%3E%3Cpath d='M40 38L38 40L40 42L42 40L40 38M40 8L38 10L40 12L42 10L40 8M40 68L38 70L40 72L42 70L40 68M10 38L8 40L10 42L12 40L10 38M70 38L68 40L70 42L72 40L70 38'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       />
 
@@ -653,15 +667,16 @@ export default function AppReactFlow() {
           zoomOnPinch={true}
           panOnDrag={true}
         >
-          <Background color="#d4a574" gap={16} size={1} />
-          <Controls className="bg-white/90 border border-stone-200 rounded-lg" />
+          <Background color="#a89968" gap={20} size={1} style={{ opacity: 0.3 }} />
+          <Controls className="bg-[#fffef9]/95 border-2 border-[#d4c5a9] rounded-lg shadow-md" />
           <MiniMap
             nodeColor={(node) => {
-              if (node.data.isRoot) return '#fbbf24';
-              if (node.data.death) return '#a8a29e';
-              return '#fed7aa';
+              if (node.data.isRoot) return '#d97706';
+              if (node.data.death) return '#7c2d12';
+              return '#4a7c2c';
             }}
-            className="bg-white/90 border border-stone-200 rounded-lg"
+            className="bg-[#fffef9]/95 border-2 border-[#d4c5a9] rounded-lg shadow-md"
+            maskColor="rgba(250, 248, 243, 0.7)"
           />
         </ReactFlow>
       </div>

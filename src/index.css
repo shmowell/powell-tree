@@ -1,6 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Heritage English Theme - Design Tokens */
+:root {
+  /* Colors */
+  --heritage-ivy: #2d5016;
+  --heritage-ivy-light: #4a7c2c;
+  --heritage-burgundy: #7c2d12;
+  --heritage-gold: #d97706;
+  --heritage-parchment: #faf8f3;
+  --heritage-cream: #fffef9;
+  --heritage-border: #d4c5a9;
+  --heritage-text: #1c1917;
+
+  /* Typography */
+  --font-serif: 'EB Garamond', 'Lora', Georgia, serif;
+  --font-sans: system-ui, -apple-system, sans-serif;
+}
 
 * {
   margin: 0;
@@ -13,28 +32,32 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Outfit', system-ui, sans-serif;
+  font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--heritage-parchment);
+  color: var(--heritage-text);
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Heritage theme */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fef9c3;
+  background: var(--heritage-parchment);
+  border-left: 1px solid var(--heritage-border);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
-  border-radius: 4px;
+  background: linear-gradient(180deg, var(--heritage-gold) 0%, var(--heritage-burgundy) 100%);
+  border-radius: 5px;
+  border: 2px solid var(--heritage-parchment);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: linear-gradient(180deg, #e68900 0%, #991b1b 100%);
 }
 
 /* Animations */
