@@ -148,10 +148,10 @@ const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
           className={`
             relative px-4 py-3 rounded-xl border-2 transition-all duration-300
             ${data.isRoot
-              ? 'bg-gradient-to-br from-[#faf5e9] to-[#f5f1e8] shadow-lg border-[#d97706]'
+              ? 'bg-gradient-to-br from-[#f0e8d5] to-[#ebe2ce] shadow-lg border-[#d97706]'
               : selected
-                ? 'bg-[#fffef9] border-[#2d5016] shadow-xl'
-                : 'border-[#d4c5a9] bg-[#fffef9]/95 hover:border-[#4a7c2c] hover:shadow-lg'
+                ? 'bg-[#f5eed8] border-[#2d5016] shadow-xl'
+                : 'border-[#c4b59a] bg-[#f5eed8]/95 hover:border-[#4a7c2c] hover:shadow-lg'
             }
             ${isDeceased && !data.isRoot ? 'opacity-75' : ''}
           `}
@@ -166,7 +166,7 @@ const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
           }}
         >
         {isDeceased && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#7c2d12] border-2 border-[#fffef9]"
+          <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#7c2d12] border-2 border-[#f5eed8]"
             title="Deceased"
             style={{
               boxShadow: '0 2px 4px rgba(124, 45, 18, 0.3)'
@@ -176,12 +176,12 @@ const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
 
         <div className="flex items-center gap-3">
           <div
-            className={`text-2xl w-10 h-10 rounded-full flex items-center justify-center ${data.isRoot ? 'ring-2 ring-[#d97706] ring-offset-2 ring-offset-[#faf8f3]' : ''}`}
+            className={`text-2xl w-10 h-10 rounded-full flex items-center justify-center ${data.isRoot ? 'ring-2 ring-[#d97706] ring-offset-2 ring-offset-[#e8e0d0]' : ''}`}
             style={{
               background: data.isRoot
                 ? 'linear-gradient(135deg, #d97706 0%, #b45309 100%)'
-                : 'linear-gradient(135deg, #e3d5c0 0%, #d4c5a9 100%)',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                : 'linear-gradient(135deg, #d4c5a9 0%, #c4b59a 100%)',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.15)',
             }}
           >
             {data.photo}
@@ -214,8 +214,8 @@ const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
               text-xs font-bold transition-all duration-300
               hover:scale-110 hover:shadow-md
               ${data.isExpanded
-                ? 'border-[#2d5016] text-[#2d5016] bg-[#faf5e9]'
-                : 'border-[#d4c5a9] text-[#78716c] bg-[#fffef9] hover:border-[#4a7c2c] hover:text-[#2d5016]'
+                ? 'border-[#2d5016] text-[#2d5016] bg-[#f0e8d5]'
+                : 'border-[#c4b59a] text-[#78716c] bg-[#f5eed8] hover:border-[#4a7c2c] hover:text-[#2d5016]'
               }
             `}
           >
@@ -561,9 +561,9 @@ export default function AppReactFlow() {
     <div className="h-screen flex flex-col relative overflow-hidden"
       style={{
         background: `
-          radial-gradient(ellipse at top left, rgba(212, 197, 169, 0.15) 0%, transparent 40%),
-          radial-gradient(ellipse at bottom right, rgba(168, 153, 104, 0.1) 0%, transparent 40%),
-          linear-gradient(135deg, #faf8f3 0%, #f5f1e8 50%, #faf8f3 100%)
+          radial-gradient(ellipse at top left, rgba(124, 45, 18, 0.08) 0%, transparent 45%),
+          radial-gradient(ellipse at bottom right, rgba(217, 151, 6, 0.06) 0%, transparent 45%),
+          linear-gradient(135deg, #e8e0d0 0%, #ddd4c0 50%, #e8e0d0 100%)
         `,
       }}
     >
@@ -667,16 +667,16 @@ export default function AppReactFlow() {
           zoomOnPinch={true}
           panOnDrag={true}
         >
-          <Background color="#a89968" gap={20} size={1} style={{ opacity: 0.3 }} />
-          <Controls className="bg-[#fffef9]/95 border-2 border-[#d4c5a9] rounded-lg shadow-md" />
+          <Background color="#a89968" gap={20} size={1} style={{ opacity: 0.4 }} />
+          <Controls className="bg-[#f5eed8]/95 border-2 border-[#c4b59a] rounded-lg shadow-md" />
           <MiniMap
             nodeColor={(node) => {
               if (node.data.isRoot) return '#d97706';
               if (node.data.death) return '#7c2d12';
               return '#4a7c2c';
             }}
-            className="bg-[#fffef9]/95 border-2 border-[#d4c5a9] rounded-lg shadow-md"
-            maskColor="rgba(250, 248, 243, 0.7)"
+            className="bg-[#f5eed8]/95 border-2 border-[#c4b59a] rounded-lg shadow-md"
+            maskColor="rgba(232, 224, 208, 0.7)"
           />
         </ReactFlow>
       </div>
