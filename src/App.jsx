@@ -302,7 +302,7 @@ function DetailPanel({ person, onClose }) {
   );
 }
 
-function PannableCanvas({ children, zoom }) {
+function PannableCanvas({ children, zoom, setZoom }) {
   const containerRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -348,6 +348,12 @@ function PannableCanvas({ children, zoom }) {
     });
   };
 
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+    setZoom(z => Math.min(1.5, Math.max(0.2, z + delta)));
+  };
+
   const resetPosition = () => {
     setPosition({ x: 0, y: 0 });
   };
@@ -361,6 +367,15 @@ function PannableCanvas({ children, zoom }) {
       window.removeEventListener('touchend', handleUp);
     };
   }, []);
+
+  // Add wheel event listener with passive: false to allow preventDefault
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, [setZoom]);
 
   return (
     <div 
@@ -533,7 +548,7 @@ export default function App() {
       </div>
 
       {/* Pannable Ancestry Tree */}
-      <PannableCanvas zoom={zoom}>
+      <PannableCanvas zoom={zoom} setZoom={setZoom}>
         <AncestryBranch 
           node={familyData}
           onSelectPerson={setSelectedPerson}
@@ -570,7 +585,7 @@ export default function App() {
 
       {/* Help Text */}
       <div className="fixed bottom-4 right-4 z-40 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-500">
-        Drag to pan • Click card for details • Click ▼ for ancestors
+        Scroll to zoom • Drag to pan • Click ▼ for ancestors
       </div>
     </div>
   );
