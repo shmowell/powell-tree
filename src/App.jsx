@@ -1,5 +1,8 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { parseGedcom, buildAncestryTree, findPersonByName } from './gedcomParser';
+import { SearchBar } from './components/SearchBar';
+import { Breadcrumbs } from './components/Breadcrumbs';
+import { GenerationControl } from './components/GenerationControl';
 
 // User configuration - maps user keys to their names in the GEDCOM
 const userConfig = {
@@ -89,8 +92,8 @@ function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded
   );
 }
 
-function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
-  const hasParents = node.father || node.mother;
+function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false, depth = 0, maxDepth = 20 }) {
+  const hasParents = (node.father || node.mother) && depth < maxDepth;
   const isExpanded = expandedNodes.has(node.id);
   
   const containerRef = useRef(null);
@@ -175,6 +178,8 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
                   selectedPerson={selectedPerson}
                   expandedNodes={expandedNodes}
                   toggleExpand={toggleExpand}
+                  depth={depth + 1}
+                  maxDepth={maxDepth}
                 />
               </div>
             )}
@@ -186,6 +191,8 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
                   selectedPerson={selectedPerson}
                   expandedNodes={expandedNodes}
                   toggleExpand={toggleExpand}
+                  depth={depth + 1}
+                  maxDepth={maxDepth}
                 />
               </div>
             )}
@@ -408,6 +415,8 @@ export default function App() {
   const [familyTrees, setFamilyTrees] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [parsedData, setParsedData] = useState({ individuals: {}, families: {} });
+  const [maxGenerations, setMaxGenerations] = useState(5);
 
   // Load and parse GEDCOM file on mount
   useEffect(() => {
@@ -420,7 +429,10 @@ export default function App() {
         }
         const gedcomText = await response.text();
         const { individuals, families } = parseGedcom(gedcomText);
-        
+
+        // Save parsed data for search
+        setParsedData({ individuals, families });
+
         // Build trees for each user
         const trees = {};
         for (const [key, config] of Object.entries(userConfig)) {
@@ -464,12 +476,88 @@ export default function App() {
     });
   }, []);
 
+  // Helper function: Find path from root to target person
+  const findPathInTree = useCallback((node, targetId, currentPath = []) => {
+    if (!node) return null;
+
+    const newPath = [...currentPath, node.id];
+    if (node.id === targetId) return newPath;
+
+    const fatherPath = node.father ? findPathInTree(node.father, targetId, newPath) : null;
+    if (fatherPath) return fatherPath;
+
+    const motherPath = node.mother ? findPathInTree(node.mother, targetId, newPath) : null;
+    if (motherPath) return motherPath;
+
+    return null;
+  }, []);
+
+  // Navigate to a person by expanding path and optionally selecting
+  const navigateToPerson = useCallback((personId) => {
+    if (!familyData) return;
+
+    const path = findPathInTree(familyData, personId);
+    if (path) {
+      setExpandedNodes(new Set(path));
+      // Find person in tree for detail panel
+      const findPerson = (node) => {
+        if (!node) return null;
+        if (node.id === personId) return node;
+        return findPerson(node.father) || findPerson(node.mother);
+      };
+      const person = findPerson(familyData);
+      if (person) {
+        setSelectedPerson(person);
+      }
+    }
+  }, [familyData, findPathInTree]);
+
+  // Build breadcrumb path with person details
+  const buildPathToSelected = useCallback((targetId) => {
+    if (!targetId || !familyData) return [];
+
+    const idPath = findPathInTree(familyData, targetId);
+    if (!idPath) return [];
+
+    const detailPath = [];
+    let currentNode = familyData;
+
+    for (let i = 0; i < idPath.length; i++) {
+      const id = idPath[i];
+      if (currentNode && currentNode.id === id) {
+        detailPath.push({
+          id: currentNode.id,
+          name: currentNode.name,
+          photo: currentNode.photo
+        });
+
+        // Navigate to next node
+        const nextId = idPath[i + 1];
+        if (nextId) {
+          if (currentNode.father?.id === nextId) {
+            currentNode = currentNode.father;
+          } else if (currentNode.mother?.id === nextId) {
+            currentNode = currentNode.mother;
+          }
+        }
+      }
+    }
+
+    return detailPath;
+  }, [familyData, findPathInTree]);
+
+  // Compute breadcrumb path when selection changes
+  const ancestryPath = useMemo(() =>
+    selectedPerson ? buildPathToSelected(selectedPerson.id) : [],
+    [selectedPerson, buildPathToSelected]
+  );
+
   const expandAll = () => {
-    const getAllIds = (node) => {
-      if (!node) return [];
+    const getAllIds = (node, depth = 0) => {
+      if (!node || depth >= maxGenerations) return [];
       let ids = [node.id];
-      if (node.father) ids = [...ids, ...getAllIds(node.father)];
-      if (node.mother) ids = [...ids, ...getAllIds(node.mother)];
+      if (node.father && depth + 1 < maxGenerations) ids = [...ids, ...getAllIds(node.father, depth + 1)];
+      if (node.mother && depth + 1 < maxGenerations) ids = [...ids, ...getAllIds(node.mother, depth + 1)];
       return ids;
     };
     if (familyData) {
@@ -555,7 +643,7 @@ export default function App() {
         </p>
         
         {/* User Selector */}
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-4">
           <select
             value={currentUser}
             onChange={(e) => setCurrentUser(e.target.value)}
@@ -568,7 +656,26 @@ export default function App() {
             ))}
           </select>
         </div>
+
+        {/* Search Bar */}
+        <div className="flex justify-center">
+          <SearchBar
+            individuals={parsedData.individuals}
+            onSelectPerson={navigateToPerson}
+          />
+        </div>
       </header>
+
+      {/* Breadcrumbs */}
+      {ancestryPath.length > 0 && (
+        <div className="relative z-10 flex justify-center mb-4 px-4 flex-shrink-0">
+          <Breadcrumbs
+            path={ancestryPath}
+            onNavigate={navigateToPerson}
+            rootName={userConfig[currentUser].label}
+          />
+        </div>
+      )}
 
       {/* Controls */}
       <div className="relative z-10 flex justify-center gap-3 mb-4 px-4 flex-wrap flex-shrink-0">
@@ -578,21 +685,31 @@ export default function App() {
         >
           <span>📖</span> Expand All
         </button>
-        <button 
+        <button
           onClick={collapseAll}
           className="px-4 py-2 bg-white/80 hover:bg-white rounded-full border border-stone-200 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all flex items-center gap-2"
         >
           <span>📕</span> Collapse
         </button>
+        <GenerationControl
+          maxGenerations={maxGenerations}
+          setMaxGenerations={setMaxGenerations}
+        />
+        <button
+          onClick={() => setZoom(0.8)}
+          className="px-4 py-2 bg-white/80 hover:bg-white rounded-full border border-stone-200 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all flex items-center gap-2"
+        >
+          <span>⛶</span> Fit Screen
+        </button>
         <div className="flex items-center gap-2 px-3 bg-white/80 rounded-full border border-stone-200 shadow-sm">
-          <button 
+          <button
             onClick={() => setZoom(z => Math.max(0.2, z - 0.1))}
             className="w-7 h-7 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600"
           >
             −
           </button>
           <span className="text-sm text-stone-500 w-12 text-center">{Math.round(zoom * 100)}%</span>
-          <button 
+          <button
             onClick={() => setZoom(z => Math.min(1.5, z + 0.1))}
             className="w-7 h-7 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600"
           >
@@ -603,13 +720,15 @@ export default function App() {
 
       {/* Pannable Ancestry Tree */}
       <PannableCanvas zoom={zoom} setZoom={setZoom}>
-        <AncestryBranch 
+        <AncestryBranch
           node={familyData}
           onSelectPerson={setSelectedPerson}
           selectedPerson={selectedPerson}
           expandedNodes={expandedNodes}
           toggleExpand={toggleExpand}
           isRoot={true}
+          depth={0}
+          maxDepth={maxGenerations}
         />
       </PannableCanvas>
 
