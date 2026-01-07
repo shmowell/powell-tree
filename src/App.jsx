@@ -625,50 +625,85 @@ export default function App() {
         }}
       />
       
-      {/* Header */}
-      <header className="relative z-10 text-center py-6 px-4 flex-shrink-0">
-        <div className="inline-flex items-center gap-3 mb-2">
-          <div className="w-12 h-0.5 bg-gradient-to-r from-transparent to-amber-400 rounded-full" />
-          <span className="text-amber-600 text-2xl">🌳</span>
-          <div className="w-12 h-0.5 bg-gradient-to-l from-transparent to-amber-400 rounded-full" />
-        </div>
-        <h1 
-          className="text-4xl md:text-5xl font-bold text-stone-800 mb-2 font-display"
-          style={{ textShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
-        >
-          The Powell Family
-        </h1>
-        <p className="text-stone-500 text-lg mb-4">
-          Ancestry of {userConfig[currentUser].label}
-        </p>
-        
-        {/* User Selector */}
-        <div className="flex justify-center mb-4">
-          <select
-            value={currentUser}
-            onChange={(e) => setCurrentUser(e.target.value)}
-            className="px-4 py-2 bg-white/90 rounded-full border border-stone-300 text-stone-700 font-medium shadow-sm hover:shadow transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
-          >
-            {Object.entries(userConfig).map(([key, config]) => (
-              <option key={key} value={key}>
-                {config.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* Compact Header/Navbar */}
+      <header className="relative z-10 flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-stone-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          {/* Top Row: Title + User Selector */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-amber-600 text-xl">🌳</span>
+              <div>
+                <h1 className="text-xl font-bold text-stone-800">The Powell Family</h1>
+                <p className="text-xs text-stone-500">Ancestry Explorer</p>
+              </div>
+            </div>
+            <select
+              value={currentUser}
+              onChange={(e) => setCurrentUser(e.target.value)}
+              className="px-3 py-1.5 bg-white rounded-full border border-stone-300 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              {Object.entries(userConfig).map(([key, config]) => (
+                <option key={key} value={key}>
+                  {config.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* Search Bar */}
-        <div className="flex justify-center">
-          <SearchBar
-            individuals={parsedData.individuals}
-            onSelectPerson={navigateToPerson}
-          />
+          {/* Bottom Row: Controls */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <SearchBar
+              individuals={parsedData.individuals}
+              onSelectPerson={navigateToPerson}
+            />
+            <div className="flex-1 min-w-0" />
+            <button
+              onClick={expandAll}
+              className="px-3 py-1.5 bg-white hover:bg-stone-50 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all"
+              title="Expand All"
+            >
+              📖
+            </button>
+            <button
+              onClick={collapseAll}
+              className="px-3 py-1.5 bg-white hover:bg-stone-50 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all"
+              title="Collapse All"
+            >
+              📕
+            </button>
+            <GenerationControl
+              maxGenerations={maxGenerations}
+              setMaxGenerations={setMaxGenerations}
+            />
+            <button
+              onClick={() => setZoom(0.8)}
+              className="px-3 py-1.5 bg-white hover:bg-stone-50 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all"
+              title="Fit to Screen"
+            >
+              ⛶
+            </button>
+            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full border border-stone-200 shadow-sm">
+              <button
+                onClick={() => setZoom(z => Math.max(0.2, z - 0.1))}
+                className="w-6 h-6 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600 text-sm"
+              >
+                −
+              </button>
+              <span className="text-xs text-stone-500 w-10 text-center">{Math.round(zoom * 100)}%</span>
+              <button
+                onClick={() => setZoom(z => Math.min(1.5, z + 0.1))}
+                className="w-6 h-6 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600 text-sm"
+              >
+                +
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Breadcrumbs */}
       {ancestryPath.length > 0 && (
-        <div className="relative z-10 flex justify-center mb-4 px-4 flex-shrink-0">
+        <div className="relative z-10 flex justify-center py-2 px-4 flex-shrink-0 bg-amber-50/50">
           <Breadcrumbs
             path={ancestryPath}
             onNavigate={navigateToPerson}
@@ -676,47 +711,6 @@ export default function App() {
           />
         </div>
       )}
-
-      {/* Controls */}
-      <div className="relative z-10 flex justify-center gap-3 mb-4 px-4 flex-wrap flex-shrink-0">
-        <button 
-          onClick={expandAll}
-          className="px-4 py-2 bg-white/80 hover:bg-white rounded-full border border-stone-200 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all flex items-center gap-2"
-        >
-          <span>📖</span> Expand All
-        </button>
-        <button
-          onClick={collapseAll}
-          className="px-4 py-2 bg-white/80 hover:bg-white rounded-full border border-stone-200 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all flex items-center gap-2"
-        >
-          <span>📕</span> Collapse
-        </button>
-        <GenerationControl
-          maxGenerations={maxGenerations}
-          setMaxGenerations={setMaxGenerations}
-        />
-        <button
-          onClick={() => setZoom(0.8)}
-          className="px-4 py-2 bg-white/80 hover:bg-white rounded-full border border-stone-200 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all flex items-center gap-2"
-        >
-          <span>⛶</span> Fit Screen
-        </button>
-        <div className="flex items-center gap-2 px-3 bg-white/80 rounded-full border border-stone-200 shadow-sm">
-          <button
-            onClick={() => setZoom(z => Math.max(0.2, z - 0.1))}
-            className="w-7 h-7 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600"
-          >
-            −
-          </button>
-          <span className="text-sm text-stone-500 w-12 text-center">{Math.round(zoom * 100)}%</span>
-          <button
-            onClick={() => setZoom(z => Math.min(1.5, z + 0.1))}
-            className="w-7 h-7 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600"
-          >
-            +
-          </button>
-        </div>
-      </div>
 
       {/* Pannable Ancestry Tree */}
       <PannableCanvas zoom={zoom} setZoom={setZoom}>

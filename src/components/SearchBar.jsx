@@ -54,12 +54,12 @@ export function SearchBar({ individuals, onSelectPerson }) {
           }}
           onFocus={() => query.length >= 2 && setIsOpen(true)}
           placeholder="Search ancestors..."
-          className="px-4 py-2 pl-10 w-80 bg-white/90 rounded-full border border-stone-300
-                     text-stone-700 placeholder-stone-400 shadow-sm
+          className="px-3 py-1.5 pl-8 w-64 bg-white rounded-full border border-stone-300
+                     text-sm text-stone-700 placeholder-stone-400 shadow-sm
                      focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400
                      transition-all"
         />
-        <span className="absolute left-3 text-stone-400 text-lg pointer-events-none">🔍</span>
+        <span className="absolute left-2.5 text-stone-400 text-sm pointer-events-none">🔍</span>
       </div>
 
       {isOpen && results.length > 0 && (
