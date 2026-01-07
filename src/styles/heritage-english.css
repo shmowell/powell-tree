@@ -1,0 +1,164 @@
+/* Heritage English Theme - Historical British Estate Aesthetic */
+
+:root {
+  /* Primary Colors - Deep heritage greens and burgundy */
+  --primary: #2d5016;           /* Deep English Ivy - Main actions */
+  --primary-light: #4a7c2c;     /* Lighter Ivy - Hover states */
+  --primary-dark: #1a3309;      /* Darker Forest - Active states */
+
+  /* Secondary Colors - Classic British heritage */
+  --secondary: #7c2d12;         /* Burgundy/Oxblood - Secondary actions */
+  --secondary-light: #991b1b;   /* Bright Burgundy - Hover */
+  --accent: #d97706;            /* Burnt Gold - Highlights, crests */
+
+  /* Neutral Colors - Aged parchment and stone */
+  --background: #faf8f3;        /* Aged Parchment - Page background */
+  --background-alt: #f5f1e8;    /* Aged Paper - Alternative background */
+  --surface: #fffef9;           /* Cream - Cards, panels */
+  --border: #d4c5a9;            /* Faded Gold - Borders */
+  --border-dark: #a89968;       /* Darker Border - Emphasis */
+
+  /* Text Colors - Classic ink and aged text */
+  --text-primary: #1c1917;      /* Deep Charcoal - Headings, primary text */
+  --text-secondary: #44403c;    /* Warm Gray - Body text */
+  --text-tertiary: #78716c;     /* Stone - Muted text, placeholders */
+  --text-light: #a8a29e;        /* Light Stone - Very subtle text */
+
+  /* Heritage Accents - Classic British colors */
+  --heritage-green: #2d5016;    /* English Ivy Green */
+  --heritage-burgundy: #7c2d12; /* Oxblood Burgundy */
+  --heritage-gold: #d97706;     /* Antique Gold */
+  --heritage-navy: #1e3a5f;     /* British Naval Blue */
+  --heritage-cream: #faf5e9;    /* Clotted Cream */
+
+  /* Semantic Colors */
+  --success: #4a7c2c;           /* Ivy Green */
+  --warning: #d97706;           /* Burnt Gold */
+  --error: #991b1b;             /* Deep Red */
+  --info: #1e3a5f;              /* Naval Blue */
+
+  /* Shadows - Subtle, aged appearance */
+  --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.08);
+  --shadow: 0 2px 4px rgba(28, 25, 23, 0.1), 0 1px 2px rgba(28, 25, 23, 0.06);
+  --shadow-md: 0 4px 6px rgba(28, 25, 23, 0.12), 0 2px 4px rgba(28, 25, 23, 0.08);
+  --shadow-lg: 0 10px 15px rgba(28, 25, 23, 0.15), 0 4px 6px rgba(28, 25, 23, 0.1);
+  --shadow-xl: 0 20px 25px rgba(28, 25, 23, 0.18), 0 10px 10px rgba(28, 25, 23, 0.1);
+
+  /* Decorative Elements */
+  --ornament-color: #a89968;    /* Faded gold for decorative elements */
+  --crest-color: #d97706;       /* Burnt gold for family crests */
+  --seal-color: #7c2d12;        /* Burgundy for wax seal effects */
+}
+
+/* Tailwind Custom Classes for Heritage English Theme */
+
+/* Backgrounds */
+.bg-heritage-parchment {
+  background: linear-gradient(135deg, #faf8f3 0%, #f5f1e8 100%);
+}
+
+.bg-heritage-aged-paper {
+  background-color: #f5f1e8;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(212, 197, 169, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(168, 153, 104, 0.05) 0%, transparent 50%);
+}
+
+/* Card with aged paper texture */
+.card-heritage {
+  background: #fffef9;
+  border: 2px solid #d4c5a9;
+  box-shadow:
+    0 4px 6px rgba(28, 25, 23, 0.08),
+    inset 0 1px 0 rgba(250, 245, 233, 0.5);
+}
+
+/* Heritage button styles */
+.btn-heritage-primary {
+  background: linear-gradient(135deg, #4a7c2c 0%, #2d5016 100%);
+  color: #faf5e9;
+  border: 1px solid #1a3309;
+  box-shadow: 0 2px 4px rgba(45, 80, 22, 0.3);
+}
+
+.btn-heritage-primary:hover {
+  background: linear-gradient(135deg, #5a8f3c 0%, #3d6026 100%);
+  box-shadow: 0 4px 6px rgba(45, 80, 22, 0.4);
+}
+
+.btn-heritage-secondary {
+  background: linear-gradient(135deg, #991b1b 0%, #7c2d12 100%);
+  color: #faf5e9;
+  border: 1px solid #7c2d12;
+  box-shadow: 0 2px 4px rgba(124, 45, 18, 0.3);
+}
+
+/* Ornamental divider */
+.divider-heritage {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #a89968 20%,
+    #d97706 50%,
+    #a89968 80%,
+    transparent 100%
+  );
+}
+
+/* Wax seal effect for important elements */
+.seal-heritage {
+  position: relative;
+}
+
+.seal-heritage::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle, #991b1b 0%, #7c2d12 70%, #581c0f 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Family crest accent */
+.crest-accent {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Aged border effect */
+.border-heritage-aged {
+  border: 2px solid;
+  border-image: linear-gradient(
+    135deg,
+    #d4c5a9 0%,
+    #a89968 25%,
+    #d4c5a9 50%,
+    #a89968 75%,
+    #d4c5a9 100%
+  ) 1;
+}
+
+/* Parchment texture overlay */
+.texture-parchment {
+  position: relative;
+  background-color: #fffef9;
+}
+
+.texture-parchment::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(212, 197, 169, 0.03) 2px,
+      rgba(212, 197, 169, 0.03) 4px
+    );
+  pointer-events: none;
+}

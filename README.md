@@ -1,23 +1,42 @@
-# 🌳 Family Tree
+# 🌳 Powell Family Tree
 
-An interactive family tree website to explore and visualize your family heritage.
+An interactive horizontal family tree website for the Powell family with 4,915 individuals from GEDCOM data.
 
-![Family Tree Preview](https://img.shields.io/badge/React-18-blue) ![Vite](https://img.shields.io/badge/Vite-5-purple) ![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-cyan)
+![Family Tree Preview](https://img.shields.io/badge/React-18-blue) ![Vite](https://img.shields.io/badge/Vite-5-purple) ![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-cyan) ![React_Flow](https://img.shields.io/badge/ReactFlow-11-green) ![react_d3_tree](https://img.shields.io/badge/react--d3--tree-3-orange)
 
 ## Features
 
-- **Interactive Navigation** — Expand and collapse family branches
-- **Person Details** — Click any family member to view their information
-- **Spouse Connections** — Visual links between married couples
-- **Living/Deceased Indicators** — Clear visual distinction
-- **Zoom Controls** — Scale the tree from 50% to 150%
-- **Responsive Design** — Works on desktop and mobile
+### Core Features
+
+- **Horizontal Tree Layout** — Root person on left, ancestors extending right
+- **Dual Implementations** — Choose between react-d3-tree or React Flow
+- **Interactive Navigation** — Expand and collapse ancestor branches with +/− buttons
+- **Search Functionality** — Find any ancestor by name
+- **Breadcrumb Trail** — See and navigate the ancestry path
+- **Generation Control** — Limit visible generations (1-10+)
+- **Person Details** — Click any card to view detailed information
+- **Pan & Zoom** — Navigate large trees smoothly
+- **4 User Views** — Switch between family members' perspectives
+
+### React Flow Version (Enhanced)
+
+- **Professional Controls** — Zoom +/−, fit view, fullscreen toggle
+- **Minimap** — Bird's eye view for large tree navigation
+- **Dot Grid Background** — Better spatial awareness
+- **Optimized Performance** — Handles 1000+ nodes smoothly
+- **Dagre Layout** — Automatic tree positioning
+
+### react-d3-tree Version (Simple)
+
+- **Lightweight** — Smaller bundle size
+- **Tree-Focused** — Purpose-built for hierarchical trees
+- **Clean Interface** — Minimal UI, maximum focus
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Local Development
@@ -38,32 +57,46 @@ Open [http://localhost:5173](http://localhost:5173) to view the app.
 npm run build
 ```
 
-## Customizing Your Family Tree
+## Switching Between Implementations
 
-Edit the `familyData` object in `src/App.jsx` to add your own family members:
+You can toggle between react-d3-tree and React Flow versions by editing `src/main.jsx`:
 
 ```javascript
-const familyData = {
-  id: 1,
-  name: "Your Ancestor Name",
-  birth: "1900",
-  death: "1980",  // Optional - remove for living people
-  photo: "👴",    // Use emoji or image URL
-  spouse: {
-    name: "Spouse Name",
-    birth: "1905",
-    photo: "👵"
-  },
-  children: [
-    // Add children here with the same structure
-  ]
-};
+// Line 9 in src/main.jsx
+const USE_REACT_FLOW = true;  // Switch to React Flow
+const USE_REACT_FLOW = false; // Switch to react-d3-tree
 ```
 
-### Photo Options
+Save the file and the dev server will automatically reload with the selected version.
 
-- Use emojis: `"👨"`, `"👩"`, `"👴"`, `"👵"`, `"👦"`, `"👧"`
-- Use image URLs for real photos (update the component to render `<img>` tags)
+### Which Version Should I Use?
+
+**Use react-d3-tree if:**
+
+- You want a simpler, cleaner interface
+- Smaller bundle size is important
+- You primarily view small to medium trees
+
+**Use React Flow if:**
+
+- You need professional controls and minimap
+- You'll be exploring very large trees (500+ nodes)
+- You want the best performance and UX features
+
+## Using the GEDCOM Data
+
+The tree loads family data from `public/family.ged` (4,915 individuals). To use your own GEDCOM file:
+
+1. Export GEDCOM from your genealogy software
+2. Replace `public/family.ged` with your file
+3. Update user configuration in `src/App.jsx` (line 9-13):
+
+```javascript
+const userConfig = {
+  your_key: { name: 'Your Full Name', label: 'Your Display Name' },
+  // Add more users as needed
+};
+```
 
 ## Deployment
 
@@ -86,24 +119,38 @@ No environment variables are required for basic deployment.
 - **React 18** — UI framework
 - **Vite 5** — Build tool
 - **Tailwind CSS 3.4** — Styling
+- **react-d3-tree 3** — Tree visualization (default)
+- **React Flow 11** — Advanced graph visualization (optional)
+- **dagre** — Tree layout algorithm
 - **Railway** — Hosting
 
 ## Project Structure
 
-```
-family-tree-app/
+```text
+powell-tree/
 ├── public/
-│   └── tree.svg          # Favicon
+│   ├── family.ged           # GEDCOM data (4,915 individuals)
+│   └── tree.svg             # Favicon
 ├── src/
-│   ├── App.jsx           # Main component
-│   ├── main.jsx          # Entry point
-│   └── index.css         # Styles
-├── index.html            # HTML template
-├── package.json          # Dependencies
-├── vite.config.js        # Vite config
-├── tailwind.config.js    # Tailwind config
-├── postcss.config.js     # PostCSS config
-└── railway.json          # Railway config
+│   ├── components/
+│   │   ├── SearchBar.jsx    # Search functionality
+│   │   ├── Breadcrumbs.jsx  # Ancestry path navigation
+│   │   └── GenerationControl.jsx  # Depth control
+│   ├── App.jsx              # react-d3-tree implementation
+│   ├── AppReactFlow.jsx     # React Flow implementation
+│   ├── gedcomParser.js      # GEDCOM parsing utilities
+│   ├── main.jsx             # Entry point (toggle versions here)
+│   └── index.css            # Global styles
+├── docs/
+│   ├── REACT_FLOW_VS_D3_TREE.md        # Comparison guide
+│   ├── TESTING_BOTH_IMPLEMENTATIONS.md # Testing guide
+│   └── SESSION_HANDOFF_HORIZONTAL_TREE.md # Implementation notes
+├── index.html               # HTML template
+├── package.json             # Dependencies
+├── vite.config.js           # Vite config
+├── tailwind.config.js       # Tailwind config
+├── postcss.config.js        # PostCSS config
+└── railway.json             # Railway deployment config
 ```
 
 ## License
