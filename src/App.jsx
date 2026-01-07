@@ -1,387 +1,16 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { familyTrees } from './familyData';
 
-// Ancestry data - tracking heritage of Jordan Powell
-const familyData = {
-  id: 1,
-  name: "Jordan Powell",
-  birth: "2000",
-  photo: "🧑",
-  father: {
-    id: 2,
-    name: "Michael Powell",
-    birth: "1972",
-    photo: "👨",
-    father: {
-      id: 4,
-      name: "Richard Powell",
-      birth: "1945",
-      death: "2020",
-      photo: "👴",
-      father: {
-        id: 8,
-        name: "Harold Powell",
-        birth: "1918",
-        death: "1995",
-        photo: "👴",
-        father: {
-          id: 16,
-          name: "Walter Powell",
-          birth: "1890",
-          death: "1968",
-          photo: "👴",
-          father: {
-            id: 32,
-            name: "Cornelius Powell",
-            birth: "1862",
-            death: "1940",
-            photo: "👴",
-            father: {
-              id: 64,
-              name: "Josiah Powell",
-              birth: "1834",
-              death: "1912",
-              photo: "👴",
-              father: {
-                id: 128,
-                name: "Ezekiel Powell",
-                birth: "1806",
-                death: "1884",
-                photo: "👴",
-                father: {
-                  id: 256,
-                  name: "Nathaniel Powell",
-                  birth: "1778",
-                  death: "1856",
-                  photo: "👴",
-                  father: { id: 512, name: "Samuel Powell", birth: "1750", death: "1828", photo: "👴" },
-                  mother: { id: 513, name: "Abigail Whitmore", birth: "1755", death: "1833", photo: "👵" }
-                },
-                mother: {
-                  id: 257,
-                  name: "Prudence Ashford",
-                  birth: "1782",
-                  death: "1860",
-                  photo: "👵",
-                  father: { id: 514, name: "Elijah Ashford", birth: "1754", death: "1832", photo: "👴" },
-                  mother: { id: 515, name: "Mercy Blackwell", birth: "1758", death: "1836", photo: "👵" }
-                }
-              },
-              mother: {
-                id: 129,
-                name: "Hannah Mercer",
-                birth: "1810",
-                death: "1888",
-                photo: "👵",
-                father: {
-                  id: 258,
-                  name: "Tobias Mercer",
-                  birth: "1782",
-                  death: "1860",
-                  photo: "👴",
-                  father: { id: 516, name: "Jonas Mercer", birth: "1754", death: "1832", photo: "👴" },
-                  mother: { id: 517, name: "Lydia Crane", birth: "1758", death: "1836", photo: "👵" }
-                },
-                mother: {
-                  id: 259,
-                  name: "Patience Holloway",
-                  birth: "1786",
-                  death: "1864",
-                  photo: "👵",
-                  father: { id: 518, name: "Silas Holloway", birth: "1758", death: "1836", photo: "👴" },
-                  mother: { id: 519, name: "Faith Goodwin", birth: "1762", death: "1840", photo: "👵" }
-                }
-              }
-            },
-            mother: {
-              id: 65,
-              name: "Adelaide Thompson",
-              birth: "1838",
-              death: "1916",
-              photo: "👵",
-              father: {
-                id: 130,
-                name: "Edmund Thompson",
-                birth: "1810",
-                death: "1888",
-                photo: "👴",
-                father: {
-                  id: 260,
-                  name: "Reuben Thompson",
-                  birth: "1782",
-                  death: "1860",
-                  photo: "👴",
-                  father: { id: 520, name: "Caleb Thompson", birth: "1754", death: "1832", photo: "👴" },
-                  mother: { id: 521, name: "Bethany Shaw", birth: "1758", death: "1836", photo: "👵" }
-                },
-                mother: {
-                  id: 261,
-                  name: "Susannah Wentworth",
-                  birth: "1786",
-                  death: "1864",
-                  photo: "👵",
-                  father: { id: 522, name: "Amos Wentworth", birth: "1758", death: "1836", photo: "👴" },
-                  mother: { id: 523, name: "Charity Osgood", birth: "1762", death: "1840", photo: "👵" }
-                }
-              },
-              mother: {
-                id: 131,
-                name: "Harriet Sinclair",
-                birth: "1814",
-                death: "1892",
-                photo: "👵",
-                father: {
-                  id: 262,
-                  name: "Malcolm Sinclair",
-                  birth: "1786",
-                  death: "1864",
-                  photo: "👴",
-                  father: { id: 524, name: "Archibald Sinclair", birth: "1758", death: "1836", photo: "👴" },
-                  mother: { id: 525, name: "Flora MacLeod", birth: "1762", death: "1840", photo: "👵" }
-                },
-                mother: {
-                  id: 263,
-                  name: "Elspeth Campbell",
-                  birth: "1790",
-                  death: "1868",
-                  photo: "👵",
-                  father: { id: 526, name: "Duncan Campbell", birth: "1762", death: "1840", photo: "👴" },
-                  mother: { id: 527, name: "Moira Fraser", birth: "1766", death: "1844", photo: "👵" }
-                }
-              }
-            }
-          },
-          mother: {
-            id: 33,
-            name: "Clara Bennett",
-            birth: "1866",
-            death: "1944",
-            photo: "👵",
-            father: {
-              id: 66,
-              name: "George Bennett",
-              birth: "1838",
-              death: "1916",
-              photo: "👴",
-              father: {
-                id: 132,
-                name: "William Bennett",
-                birth: "1810",
-                death: "1888",
-                photo: "👴",
-                father: {
-                  id: 264,
-                  name: "John Bennett",
-                  birth: "1782",
-                  death: "1860",
-                  photo: "👴",
-                  father: { id: 528, name: "Thomas Bennett", birth: "1754", death: "1832", photo: "👴" },
-                  mother: { id: 529, name: "Mary Aldrich", birth: "1758", death: "1836", photo: "👵" }
-                },
-                mother: {
-                  id: 265,
-                  name: "Elizabeth Thorne",
-                  birth: "1786",
-                  death: "1864",
-                  photo: "👵",
-                  father: { id: 530, name: "Henry Thorne", birth: "1758", death: "1836", photo: "👴" },
-                  mother: { id: 531, name: "Anne Prescott", birth: "1762", death: "1840", photo: "👵" }
-                }
-              },
-              mother: {
-                id: 133,
-                name: "Margaret Hale",
-                birth: "1814",
-                death: "1892",
-                photo: "👵",
-                father: {
-                  id: 266,
-                  name: "Nathan Hale",
-                  birth: "1786",
-                  death: "1864",
-                  photo: "👴",
-                  father: { id: 532, name: "Enoch Hale", birth: "1758", death: "1836", photo: "👴" },
-                  mother: { id: 533, name: "Sarah Whiting", birth: "1762", death: "1840", photo: "👵" }
-                },
-                mother: {
-                  id: 267,
-                  name: "Catherine Brewster",
-                  birth: "1790",
-                  death: "1868",
-                  photo: "👵",
-                  father: { id: 534, name: "Joseph Brewster", birth: "1762", death: "1840", photo: "👴" },
-                  mother: { id: 535, name: "Ruth Standish", birth: "1766", death: "1844", photo: "👵" }
-                }
-              }
-            },
-            mother: {
-              id: 67,
-              name: "Louisa Carrington",
-              birth: "1842",
-              death: "1920",
-              photo: "👵",
-              father: {
-                id: 134,
-                name: "Frederick Carrington",
-                birth: "1814",
-                death: "1892",
-                photo: "👴",
-                father: {
-                  id: 268,
-                  name: "Charles Carrington",
-                  birth: "1786",
-                  death: "1864",
-                  photo: "👴",
-                  father: { id: 536, name: "Edward Carrington", birth: "1758", death: "1836", photo: "👴" },
-                  mother: { id: 537, name: "Dorothy Langley", birth: "1762", death: "1840", photo: "👵" }
-                },
-                mother: {
-                  id: 269,
-                  name: "Victoria Ashworth",
-                  birth: "1790",
-                  death: "1868",
-                  photo: "👵",
-                  father: { id: 538, name: "Alfred Ashworth", birth: "1762", death: "1840", photo: "👴" },
-                  mother: { id: 539, name: "Georgiana Blackwood", birth: "1766", death: "1844", photo: "👵" }
-                }
-              },
-              mother: {
-                id: 135,
-                name: "Amelia Waverly",
-                birth: "1818",
-                death: "1896",
-                photo: "👵",
-                father: {
-                  id: 270,
-                  name: "Arthur Waverly",
-                  birth: "1790",
-                  death: "1868",
-                  photo: "👴",
-                  father: { id: 540, name: "Richard Waverly", birth: "1762", death: "1840", photo: "👴" },
-                  mother: { id: 541, name: "Frances Pemberton", birth: "1766", death: "1844", photo: "👵" }
-                },
-                mother: {
-                  id: 271,
-                  name: "Isabella Thornton",
-                  birth: "1794",
-                  death: "1872",
-                  photo: "👵",
-                  father: { id: 542, name: "Robert Thornton", birth: "1766", death: "1844", photo: "👴" },
-                  mother: { id: 543, name: "Eleanor Whitfield", birth: "1770", death: "1848", photo: "👵" }
-                }
-              }
-            }
-          }
-        },
-        mother: {
-          id: 9,
-          name: "Dorothy Clarke",
-          birth: "1922",
-          death: "2010",
-          photo: "👵",
-          father: {
-            id: 18,
-            name: "Albert Clarke",
-            birth: "1894",
-            death: "1972",
-            photo: "👴",
-            father: {
-              id: 36,
-              name: "Ernest Clarke",
-              birth: "1866",
-              death: "1944",
-              photo: "👴",
-              father: { id: 72, name: "Samuel Clarke", birth: "1838", death: "1916", photo: "👴" },
-              mother: { id: 73, name: "Emma Sullivan", birth: "1842", death: "1920", photo: "👵" }
-            },
-            mother: { id: 37, name: "Rose Moretti", birth: "1870", death: "1948", photo: "👵" }
-          },
-          mother: { id: 19, name: "Edith Montgomery", birth: "1898", death: "1980", photo: "👵" }
-        }
-      },
-      mother: {
-        id: 5,
-        name: "Barbara Williams",
-        birth: "1948",
-        photo: "👩",
-        father: {
-          id: 10,
-          name: "Robert Williams",
-          birth: "1920",
-          death: "2005",
-          photo: "👴",
-          father: { id: 20, name: "James Williams", birth: "1892", death: "1970", photo: "👴" },
-          mother: { id: 21, name: "Helen Foster", birth: "1896", death: "1978", photo: "👵" }
-        },
-        mother: {
-          id: 11,
-          name: "Mary O'Brien",
-          birth: "1924",
-          death: "2012",
-          photo: "👵",
-          father: { id: 22, name: "Patrick O'Brien", birth: "1896", death: "1974", photo: "👴" },
-          mother: { id: 23, name: "Kathleen Brennan", birth: "1900", death: "1982", photo: "👵" }
-        }
-      }
-    },
-    mother: {
-      id: 3,
-      name: "Jennifer Chen",
-      birth: "1975",
-      photo: "👩",
-      father: {
-        id: 6,
-        name: "David Chen",
-        birth: "1948",
-        photo: "👨",
-        father: {
-          id: 12,
-          name: "Wei Chen",
-          birth: "1920",
-          death: "2008",
-          photo: "👴",
-          father: { id: 24, name: "Liang Chen", birth: "1892", death: "1970", photo: "👴" },
-          mother: { id: 25, name: "Mei Lin Zhang", birth: "1896", death: "1978", photo: "👵" }
-        },
-        mother: {
-          id: 13,
-          name: "Hua Wang",
-          birth: "1924",
-          death: "2015",
-          photo: "👵",
-          father: { id: 26, name: "Jun Wang", birth: "1896", death: "1974", photo: "👴" },
-          mother: { id: 27, name: "Xiu Li", birth: "1900", death: "1982", photo: "👵" }
-        }
-      },
-      mother: {
-        id: 7,
-        name: "Susan Park",
-        birth: "1952",
-        photo: "👩",
-        father: {
-          id: 14,
-          name: "Jin Park",
-          birth: "1924",
-          death: "2010",
-          photo: "👴",
-          father: { id: 28, name: "Sung Park", birth: "1896", death: "1974", photo: "👴" },
-          mother: { id: 29, name: "Young Kim", birth: "1900", death: "1982", photo: "👵" }
-        },
-        mother: {
-          id: 15,
-          name: "Hana Lee",
-          birth: "1928",
-          death: "2018",
-          photo: "👵",
-          father: { id: 30, name: "Min Lee", birth: "1900", death: "1978", photo: "👴" },
-          mother: { id: 31, name: "Soo Choi", birth: "1904", death: "1986", photo: "👵" }
-        }
-      }
-    }
-  }
+// User options
+const users = {
+  william_theodore: { key: 'william_theodore', label: 'William Theodore Powell' },
+  kristen: { key: 'kristen', label: 'Kristen Elizabeth Powell' },
+  victoria: { key: 'victoria', label: 'Victoria Maria Powell' },
+  william_jordan: { key: 'william_jordan', label: 'William Jordan Powell' },
 };
 
 function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded, hasParents, isRoot }) {
-  const isDeceased = person.death;
+  const isDeceased = person.death && person.death !== 'null';
   
   return (
     <div 
@@ -426,7 +55,7 @@ function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded
             {person.photo}
           </div>
           <div className="text-left">
-            <div className="font-semibold text-stone-800 leading-tight font-display">
+            <div className="font-semibold text-stone-800 leading-tight font-display text-sm">
               {person.name}
             </div>
             <div className="text-xs text-stone-500 mt-0.5">
@@ -463,7 +92,6 @@ function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded
 // Connector using dynamic measurements
 function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
   const hasParents = node.father || node.mother;
-  const hasBothParents = node.father && node.mother;
   const isExpanded = expandedNodes.has(node.id);
   
   const containerRef = useRef(null);
@@ -484,8 +112,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       const height = 50;
       
       let paths = [];
-      let minX = Infinity;
-      let maxX = -Infinity;
       
       // Get center top point (where curves start)
       const startX = containerRect.width / 2;
@@ -493,8 +119,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       if (fatherRef.current) {
         const fatherRect = fatherRef.current.getBoundingClientRect();
         const fatherCenterX = fatherRect.left + fatherRect.width / 2 - containerRect.left;
-        minX = Math.min(minX, fatherCenterX);
-        maxX = Math.max(maxX, fatherCenterX);
         
         // Cubic bezier from top-center to father
         paths.push(`M ${startX} 0 C ${startX} 25, ${fatherCenterX} 25, ${fatherCenterX} ${height}`);
@@ -503,8 +127,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       if (motherRef.current) {
         const motherRect = motherRef.current.getBoundingClientRect();
         const motherCenterX = motherRect.left + motherRect.width / 2 - containerRect.left;
-        minX = Math.min(minX, motherCenterX);
-        maxX = Math.max(maxX, motherCenterX);
         
         // Cubic bezier from top-center to mother
         paths.push(`M ${startX} 0 C ${startX} 25, ${motherCenterX} 25, ${motherCenterX} ${height}`);
@@ -653,8 +275,14 @@ function DetailPanel({ person, onClose }) {
           <div className="space-y-2 text-stone-700">
             <div className="flex justify-between">
               <span className="text-stone-500">Birth Year</span>
-              <span className="font-medium">{person.birth}</span>
+              <span className="font-medium">{person.birth || 'Unknown'}</span>
             </div>
+            {person.birthPlace && (
+              <div className="flex justify-between">
+                <span className="text-stone-500">Birthplace</span>
+                <span className="font-medium text-right text-sm max-w-[180px]">{person.birthPlace}</span>
+              </div>
+            )}
             {person.death && (
               <div className="flex justify-between">
                 <span className="text-stone-500">Death Year</span>
@@ -667,23 +295,6 @@ function DetailPanel({ person, onClose }) {
                 {person.death ? 'Deceased' : 'Living'}
               </span>
             </div>
-          </div>
-        </div>
-        
-        <div className="p-4 rounded-xl bg-stone-50">
-          <h3 className="text-sm font-semibold text-stone-600 uppercase tracking-wide mb-3">
-            Quick Actions
-          </h3>
-          <div className="space-y-2">
-            <button className="w-full py-2 px-4 bg-white rounded-lg border border-stone-200 text-stone-700 hover:border-amber-400 hover:bg-amber-50 transition-all text-left flex items-center gap-2">
-              <span>📝</span> Edit Details
-            </button>
-            <button className="w-full py-2 px-4 bg-white rounded-lg border border-stone-200 text-stone-700 hover:border-amber-400 hover:bg-amber-50 transition-all text-left flex items-center gap-2">
-              <span>📷</span> Add Photo
-            </button>
-            <button className="w-full py-2 px-4 bg-white rounded-lg border border-stone-200 text-stone-700 hover:border-amber-400 hover:bg-amber-50 transition-all text-left flex items-center gap-2">
-              <span>📜</span> Add Story
-            </button>
           </div>
         </div>
       </div>
@@ -789,9 +400,20 @@ function PannableCanvas({ children, zoom }) {
 }
 
 export default function App() {
+  const [currentUser, setCurrentUser] = useState('william_theodore');
   const [selectedPerson, setSelectedPerson] = useState(null);
-  const [expandedNodes, setExpandedNodes] = useState(new Set([1]));
-  const [zoom, setZoom] = useState(1);
+  const [expandedNodes, setExpandedNodes] = useState(new Set());
+  const [zoom, setZoom] = useState(0.8);
+
+  const familyData = familyTrees[currentUser];
+
+  // Reset expanded nodes when user changes, expand root by default
+  useEffect(() => {
+    if (familyData) {
+      setExpandedNodes(new Set([familyData.id]));
+      setSelectedPerson(null);
+    }
+  }, [currentUser]);
 
   const toggleExpand = useCallback((nodeId) => {
     setExpandedNodes(prev => {
@@ -807,6 +429,7 @@ export default function App() {
 
   const expandAll = () => {
     const getAllIds = (node) => {
+      if (!node) return [];
       let ids = [node.id];
       if (node.father) ids = [...ids, ...getAllIds(node.father)];
       if (node.mother) ids = [...ids, ...getAllIds(node.mother)];
@@ -816,8 +439,14 @@ export default function App() {
   };
 
   const collapseAll = () => {
-    setExpandedNodes(new Set([1]));
+    if (familyData) {
+      setExpandedNodes(new Set([familyData.id]));
+    }
   };
+
+  if (!familyData) {
+    return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div 
@@ -852,9 +481,24 @@ export default function App() {
         >
           The Powell Family
         </h1>
-        <p className="text-stone-500 text-lg">
-          Ancestry of Jordan Powell
+        <p className="text-stone-500 text-lg mb-4">
+          Ancestry of {users[currentUser].label}
         </p>
+        
+        {/* User Selector */}
+        <div className="flex justify-center">
+          <select
+            value={currentUser}
+            onChange={(e) => setCurrentUser(e.target.value)}
+            className="px-4 py-2 bg-white/90 rounded-full border border-stone-300 text-stone-700 font-medium shadow-sm hover:shadow transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            {Object.values(users).map(user => (
+              <option key={user.key} value={user.key}>
+                {user.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </header>
 
       {/* Controls */}
@@ -873,7 +517,7 @@ export default function App() {
         </button>
         <div className="flex items-center gap-2 px-3 bg-white/80 rounded-full border border-stone-200 shadow-sm">
           <button 
-            onClick={() => setZoom(z => Math.max(0.3, z - 0.1))}
+            onClick={() => setZoom(z => Math.max(0.2, z - 0.1))}
             className="w-7 h-7 rounded-full hover:bg-stone-100 flex items-center justify-center text-stone-600"
           >
             −
@@ -911,7 +555,7 @@ export default function App() {
         <div className="flex items-center gap-4 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-600">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 ring-1 ring-amber-400" />
-            <span>Subject</span>
+            <span>You</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-200 to-amber-400" />
