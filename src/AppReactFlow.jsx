@@ -89,7 +89,7 @@ function convertTreeToNodesAndEdges(treeNode, expandedNodes, maxDepth, depth = 0
       id: `${parentId}-${treeNode.id}`,
       source: parentId,
       target: treeNode.id,
-      type: 'smoothstep',
+      type: 'step',  // PERFORMANCE: step is faster than smoothstep
       animated: false,
       style: { stroke: '#a8a29e', strokeWidth: 2 },
     });
@@ -125,8 +125,8 @@ function convertTreeToNodesAndEdges(treeNode, expandedNodes, maxDepth, depth = 0
   return { nodes, edges };
 }
 
-// Custom PersonCard node component
-function PersonCardNode({ data, selected }) {
+// PERFORMANCE: Memoize PersonCard component to prevent unnecessary re-renders
+const PersonCardNode = React.memo(function PersonCardNode({ data, selected }) {
   const isDeceased = data.death && data.death !== 'null';
 
   return (
@@ -211,7 +211,14 @@ function PersonCardNode({ data, selected }) {
       </div>
     </>
   );
-}
+}, (prevProps, nextProps) => {
+  // Only re-render if these props change
+  return (
+    prevProps.data.id === nextProps.data.id &&
+    prevProps.data.isExpanded === nextProps.data.isExpanded &&
+    prevProps.selected === nextProps.selected
+  );
+});
 
 const nodeTypes = {
   personCard: PersonCardNode,
@@ -360,24 +367,31 @@ export default function AppReactFlow() {
 
   const familyData = familyTrees?.[currentUser];
 
-  // Convert tree to nodes and edges, then layout
-  useEffect(() => {
-    if (!familyData) return;
+  // PERFORMANCE: Memoize tree data conversion (expensive operation)
+  const { rawNodes, rawEdges } = useMemo(() => {
+    if (!familyData) return { rawNodes: [], rawEdges: [] };
 
-    const { nodes: rawNodes, edges: rawEdges } = convertTreeToNodesAndEdges(
+    const { nodes, edges } = convertTreeToNodesAndEdges(
       familyData,
       expandedNodes,
       maxGenerations
     );
+    return { rawNodes: nodes, rawEdges: edges };
+  }, [familyData, expandedNodes, maxGenerations]);
 
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-      rawNodes,
-      rawEdges
-    );
+  // PERFORMANCE: Memoize layout calculation (expensive operation)
+  const { layoutedNodes, layoutedEdges } = useMemo(() => {
+    if (rawNodes.length === 0) return { layoutedNodes: [], layoutedEdges: [] };
 
+    const { nodes, edges } = getLayoutedElements(rawNodes, rawEdges);
+    return { layoutedNodes: nodes, layoutedEdges: edges };
+  }, [rawNodes, rawEdges]);
+
+  // Update nodes and edges when layout changes
+  useEffect(() => {
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-  }, [familyData, expandedNodes, maxGenerations, setNodes, setEdges]);
+  }, [layoutedNodes, layoutedEdges, setNodes, setEdges]);
 
   // Setup global callbacks
   useEffect(() => {
@@ -625,6 +639,19 @@ export default function AppReactFlow() {
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={true}
+
+          // PERFORMANCE: Critical optimizations for large trees (20+ generations)
+          onlyRenderVisibleElements={true}  // Only render nodes in viewport
+          selectNodesOnDrag={false}         // Disable selection on drag
+          snapToGrid={false}                // No snapping needed
+          defaultEdgeOptions={{
+            type: 'step',                   // Simpler than smoothstep (faster)
+            animated: false,                // No animation = faster
+          }}
+          panOnScroll={false}               // Zoom on scroll instead
+          zoomOnScroll={true}
+          zoomOnPinch={true}
+          panOnDrag={true}
         >
           <Background color="#d4a574" gap={16} size={1} />
           <Controls className="bg-white/90 border border-stone-200 rounded-lg" />
