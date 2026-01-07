@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { familyTrees } from './familyData';
+import { parseGedcom, buildAncestryTree, findPersonByName } from './gedcomParser';
 
-// User options
-const users = {
-  william_theodore: { key: 'william_theodore', label: 'William Theodore Powell' },
-  kristen: { key: 'kristen', label: 'Kristen Elizabeth Powell' },
-  victoria: { key: 'victoria', label: 'Victoria Maria Powell' },
-  william_jordan: { key: 'william_jordan', label: 'William Jordan Powell' },
+// User configuration - maps user keys to their names in the GEDCOM
+const userConfig = {
+  william_theodore: { name: 'William Theodore Powell', label: 'William Theodore Powell' },
+  kristen: { name: 'Kristen Elizabeth Powell', label: 'Kristen Elizabeth Powell' },
+  victoria: { name: 'Victoria Maria Powell', label: 'Victoria Maria Powell' },
+  william_jordan: { name: 'William Jordan Powell', label: 'William Jordan Powell' },
 };
 
 function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded, hasParents, isRoot }) {
@@ -89,7 +89,6 @@ function PersonCard({ person, onCardClick, onExpandClick, isSelected, isExpanded
   );
 }
 
-// Connector using dynamic measurements
 function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, toggleExpand, isRoot = false }) {
   const hasParents = node.father || node.mother;
   const isExpanded = expandedNodes.has(node.id);
@@ -100,7 +99,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
   const [curvePath, setCurvePath] = useState('');
   const [svgSize, setSvgSize] = useState({ width: 0, height: 50 });
 
-  // Calculate curve paths based on actual DOM positions
   useEffect(() => {
     if (!isExpanded || !hasParents) return;
     
@@ -112,23 +110,17 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       const height = 50;
       
       let paths = [];
-      
-      // Get center top point (where curves start)
       const startX = containerRect.width / 2;
       
       if (fatherRef.current) {
         const fatherRect = fatherRef.current.getBoundingClientRect();
         const fatherCenterX = fatherRect.left + fatherRect.width / 2 - containerRect.left;
-        
-        // Cubic bezier from top-center to father
         paths.push(`M ${startX} 0 C ${startX} 25, ${fatherCenterX} 25, ${fatherCenterX} ${height}`);
       }
       
       if (motherRef.current) {
         const motherRect = motherRef.current.getBoundingClientRect();
         const motherCenterX = motherRect.left + motherRect.width / 2 - containerRect.left;
-        
-        // Cubic bezier from top-center to mother
         paths.push(`M ${startX} 0 C ${startX} 25, ${motherCenterX} 25, ${motherCenterX} ${height}`);
       }
       
@@ -136,7 +128,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       setSvgSize({ width: containerRect.width, height });
     };
     
-    // Update after render and on resize
     const timer = setTimeout(updateCurves, 10);
     window.addEventListener('resize', updateCurves);
     
@@ -160,7 +151,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
       
       {hasParents && isExpanded && (
         <>
-          {/* SVG curved connector - positioned over the parent row */}
           <div style={{ height: svgSize.height, width: '100%', display: 'flex', justifyContent: 'center' }}>
             <svg 
               width={svgSize.width || 100} 
@@ -176,7 +166,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
             </svg>
           </div>
           
-          {/* Parents row */}
           <div className="flex gap-8">
             {node.father && (
               <div ref={fatherRef}>
@@ -210,7 +199,6 @@ function AncestryBranch({ node, onSelectPerson, selectedPerson, expandedNodes, t
 function DetailPanel({ person, onClose }) {
   const panelRef = useRef(null);
   
-  // Close panel when clicking outside
   useEffect(() => {
     if (!person) return;
     
@@ -220,7 +208,6 @@ function DetailPanel({ person, onClose }) {
       }
     };
     
-    // Delay adding listener to prevent immediate close
     const timer = setTimeout(() => {
       document.addEventListener('mousedown', handleClickOutside);
     }, 100);
@@ -236,7 +223,7 @@ function DetailPanel({ person, onClose }) {
   return (
     <div 
       ref={panelRef}
-      className="fixed right-0 top-0 h-full w-80 bg-white/95 shadow-2xl border-l border-stone-200 p-6 overflow-y-auto z-50 animate-slideIn"
+      className="fixed right-0 top-0 h-full w-80 bg-white/95 shadow-2xl border-l border-stone-200 p-6 overflow-y-auto z-50"
       style={{ backdropFilter: 'blur(20px)' }}
     >
       <button 
@@ -348,11 +335,11 @@ function PannableCanvas({ children, zoom, setZoom }) {
     });
   };
 
-  const handleWheel = (e) => {
+  const handleWheel = useCallback((e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.05 : 0.05;
     setZoom(z => Math.min(1.5, Math.max(0.2, z + delta)));
-  };
+  }, [setZoom]);
 
   const resetPosition = () => {
     setPosition({ x: 0, y: 0 });
@@ -368,14 +355,13 @@ function PannableCanvas({ children, zoom, setZoom }) {
     };
   }, []);
 
-  // Add wheel event listener with passive: false to allow preventDefault
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
       container.addEventListener('wheel', handleWheel, { passive: false });
       return () => container.removeEventListener('wheel', handleWheel);
     }
-  }, [setZoom]);
+  }, [handleWheel]);
 
   return (
     <div 
@@ -419,16 +405,52 @@ export default function App() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [expandedNodes, setExpandedNodes] = useState(new Set());
   const [zoom, setZoom] = useState(0.8);
+  const [familyTrees, setFamilyTrees] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const familyData = familyTrees[currentUser];
+  // Load and parse GEDCOM file on mount
+  useEffect(() => {
+    async function loadGedcom() {
+      try {
+        setLoading(true);
+        const response = await fetch('/family.ged');
+        if (!response.ok) {
+          throw new Error('Failed to load family.ged file');
+        }
+        const gedcomText = await response.text();
+        const { individuals, families } = parseGedcom(gedcomText);
+        
+        // Build trees for each user
+        const trees = {};
+        for (const [key, config] of Object.entries(userConfig)) {
+          const personId = findPersonByName(config.name, individuals);
+          if (personId) {
+            trees[key] = buildAncestryTree(personId, individuals, families);
+          }
+        }
+        
+        setFamilyTrees(trees);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading GEDCOM:', err);
+        setError(err.message);
+        setLoading(false);
+      }
+    }
+    
+    loadGedcom();
+  }, []);
 
-  // Reset expanded nodes when user changes, expand root by default
+  const familyData = familyTrees?.[currentUser];
+
+  // Reset expanded nodes when user changes
   useEffect(() => {
     if (familyData) {
       setExpandedNodes(new Set([familyData.id]));
       setSelectedPerson(null);
     }
-  }, [currentUser]);
+  }, [currentUser, familyData?.id]);
 
   const toggleExpand = useCallback((nodeId) => {
     setExpandedNodes(prev => {
@@ -450,7 +472,9 @@ export default function App() {
       if (node.mother) ids = [...ids, ...getAllIds(node.mother)];
       return ids;
     };
-    setExpandedNodes(new Set(getAllIds(familyData)));
+    if (familyData) {
+      setExpandedNodes(new Set(getAllIds(familyData)));
+    }
   };
 
   const collapseAll = () => {
@@ -459,8 +483,38 @@ export default function App() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-amber-50">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🌳</div>
+          <p className="text-stone-600">Loading family tree...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-amber-50">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-stone-600">Error: {error}</p>
+          <p className="text-stone-500 text-sm mt-2">Make sure family.ged is in the public folder</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!familyData) {
-    return <div className="h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="h-screen flex items-center justify-center bg-amber-50">
+        <div className="text-center">
+          <div className="text-4xl mb-4">❓</div>
+          <p className="text-stone-600">User not found in family tree</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -497,7 +551,7 @@ export default function App() {
           The Powell Family
         </h1>
         <p className="text-stone-500 text-lg mb-4">
-          Ancestry of {users[currentUser].label}
+          Ancestry of {userConfig[currentUser].label}
         </p>
         
         {/* User Selector */}
@@ -507,9 +561,9 @@ export default function App() {
             onChange={(e) => setCurrentUser(e.target.value)}
             className="px-4 py-2 bg-white/90 rounded-full border border-stone-300 text-stone-700 font-medium shadow-sm hover:shadow transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
           >
-            {Object.values(users).map(user => (
-              <option key={user.key} value={user.key}>
-                {user.label}
+            {Object.entries(userConfig).map(([key, config]) => (
+              <option key={key} value={key}>
+                {config.label}
               </option>
             ))}
           </select>
