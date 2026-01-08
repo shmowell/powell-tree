@@ -6,7 +6,7 @@
 
 import express from 'express';
 import cors from 'cors';
-import { searchESPL, followParentLinks } from './genealogy-scraper.js';
+import { searchESPL, followParentLinks } from './stealth-scraper.js';
 import { matchIndividual, batchMatch } from './matching-engine.js';
 
 const app = express();

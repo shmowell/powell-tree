@@ -1,9 +1,15 @@
 # Powell Family Tree Server
 
-Backend server for genealogy integration features.
+Backend server for genealogy integration features with stealth web scraping.
 
 ## Features
 
+- **Stealth Web Scraping** - Advanced anti-detection techniques
+  - Puppeteer with stealth plugin
+  - Realistic browser headers
+  - User agent rotation (5 different UAs)
+  - Random delays (2-5 seconds)
+  - Headless browser automation
 - **External Genealogy Search** - Search external genealogy databases
 - **Fuzzy Matching** - Match individuals using name, dates, and locations
 - **Ancestor Discovery** - Follow parent links to discover new ancestors
