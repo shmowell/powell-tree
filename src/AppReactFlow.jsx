@@ -21,6 +21,7 @@ const userConfig = {
   kristen: { name: 'Kristen Elizabeth Powell', label: 'Kristen Elizabeth Powell' },
   victoria: { name: 'Victoria Maria Powell', label: 'Victoria Maria Powell' },
   william_jordan: { name: 'William Jordan Powell', label: 'William Jordan Powell' },
+  katharine: { name: 'Katharine Hunt Powell', label: 'Katharine Hunt Powell' },
 };
 
 // Dagre layout configuration
