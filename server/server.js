@@ -6,8 +6,14 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { searchESPL, followParentLinks } from './stealth-scraper.js';
 import { matchIndividual, batchMatch } from './matching-engine.js';
+import { addToGedcom } from './gedcom-updater.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,6 +26,33 @@ app.use(express.json());
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
+});
+
+/**
+ * GET /api/genealogy/search
+ * Info page for search endpoint
+ */
+app.get('/api/genealogy/search', (req, res) => {
+  res.json({
+    error: 'This endpoint requires a POST request',
+    usage: 'POST /api/genealogy/search',
+    body: {
+      person: {
+        name: 'string (required)',
+        birth: 'string (optional)',
+        death: 'string (optional)',
+        birthPlace: 'string (optional)'
+      }
+    },
+    example: {
+      person: {
+        name: 'John Watson',
+        birth: '1845',
+        death: '1920',
+        birthPlace: 'Scotland'
+      }
+    }
+  });
 });
 
 /**

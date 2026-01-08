@@ -36,6 +36,51 @@ npm start
 
 Server will run on http://localhost:3001
 
+## Database Enrichment
+
+Automatically scrape external genealogy sources and add discovered ancestors to your GEDCOM database.
+
+### Test Run (5 people, dry run)
+```bash
+npm run enrich:test -- --dry-run
+```
+
+### Full Enrichment (all 4,915 people)
+```bash
+npm run enrich
+```
+
+### Custom Options
+```bash
+# Process specific number of people
+node enrich-database.js --limit 50
+
+# Dry run (don't modify database)
+node enrich-database.js --dry-run
+
+# Combine options
+node enrich-database.js --limit 20 --dry-run
+```
+
+### How It Works
+
+1. **Reads GEDCOM** - Extracts all individuals from `public/family.ged`
+2. **Batch Processing** - Processes 10 people at a time with 10s delays
+3. **External Search** - Uses stealth scraping to find matches on genealogy sites
+4. **Confidence Matching** - Only adds matches above 70% confidence
+5. **Duplicate Detection** - Skips individuals already in database
+6. **Automatic Backup** - Creates timestamped backup before modifying
+7. **GEDCOM Update** - Adds new ancestors with proper formatting
+
+### Safety Features
+
+- ✅ Creates backup before any changes (`family.backup.TIMESTAMP.ged`)
+- ✅ Duplicate detection by name
+- ✅ Confidence threshold filtering (70%)
+- ✅ Dry run mode for testing
+- ✅ Rate limiting (2-5s between requests)
+- ✅ Batch delays (10s between batches)
+
 ## API Endpoints
 
 ### POST /api/genealogy/search

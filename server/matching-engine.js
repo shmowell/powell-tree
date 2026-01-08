@@ -5,7 +5,7 @@
  * using name, date, and location similarity.
  */
 
-import { distance as levenshteinDistance } from 'levenshtein';
+import { distance as levenshteinDistance } from 'fastest-levenshtein';
 
 /**
  * Match a GEDCOM person with an external person record
