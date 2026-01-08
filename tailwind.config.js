@@ -15,5 +15,21 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    // Hide scrollbar plugin for horizontal breadcrumbs
+    function({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          /* IE and Edge */
+          '-ms-overflow-style': 'none',
+          /* Firefox */
+          'scrollbar-width': 'none',
+          /* Safari and Chrome */
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          }
+        }
+      })
+    }
+  ],
 }

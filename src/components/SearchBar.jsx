@@ -42,7 +42,7 @@ export function SearchBar({ individuals, onSelectPerson }) {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative w-full sm:w-80 md:w-64" ref={dropdownRef}>
       <div className="relative flex items-center">
         <input
           ref={inputRef}
@@ -54,12 +54,14 @@ export function SearchBar({ individuals, onSelectPerson }) {
           }}
           onFocus={() => query.length >= 2 && setIsOpen(true)}
           placeholder="Search ancestors..."
-          className="px-3 py-1.5 pl-8 w-64 bg-white rounded-full border border-stone-300
+          inputMode="search"
+          className="px-3 py-2 pl-9 w-full bg-white rounded-full border border-stone-300
                      text-sm text-stone-700 placeholder-stone-400 shadow-sm
                      focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400
-                     transition-all"
+                     transition-all
+                     sm:py-1.5 sm:pl-8"
         />
-        <span className="absolute left-2.5 text-stone-400 text-sm pointer-events-none">🔍</span>
+        <span className="absolute left-3 sm:left-2.5 text-stone-400 text-base sm:text-sm pointer-events-none">🔍</span>
       </div>
 
       {isOpen && results.length > 0 && (
@@ -69,11 +71,12 @@ export function SearchBar({ individuals, onSelectPerson }) {
             <button
               key={person.id}
               onClick={() => handleSelect(person)}
-              className="w-full px-4 py-3 text-left hover:bg-amber-50
+              className="w-full px-4 py-3 text-left hover:bg-amber-50 active:bg-amber-100
                          border-b border-stone-100 last:border-0 transition-colors
-                         first:rounded-t-2xl last:rounded-b-2xl"
+                         first:rounded-t-2xl last:rounded-b-2xl
+                         min-h-[44px] sm:min-h-0"
             >
-              <div className="font-medium text-stone-800">{person.name}</div>
+              <div className="font-medium text-stone-800 text-sm sm:text-base">{person.name}</div>
               <div className="text-xs text-stone-500 mt-0.5">
                 {person.birth}{person.death ? ` — ${person.death}` : ' — Present'}
               </div>
@@ -84,7 +87,7 @@ export function SearchBar({ individuals, onSelectPerson }) {
 
       {isOpen && query.length >= 2 && results.length === 0 && (
         <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-xl
-                        border border-stone-200 p-4 text-center text-stone-500 z-50">
+                        border border-stone-200 p-4 text-center text-stone-500 text-sm z-50">
           No ancestors found matching &quot;{query}&quot;
         </div>
       )}

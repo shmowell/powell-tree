@@ -14,6 +14,7 @@ import { parseGedcom, buildAncestryTree, findPersonByName } from './gedcomParser
 import { SearchBar } from './components/SearchBar';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import { GenerationControl } from './components/GenerationControl';
+import { useIsMobile } from './hooks/useMediaQuery';
 
 // User configuration
 const userConfig = {
@@ -240,9 +241,11 @@ const nodeTypes = {
   personCard: PersonCardNode,
 };
 
-// Detail Panel component
-function DetailPanel({ person, onClose }) {
+// Responsive Detail Panel component - Bottom sheet on mobile, sidebar on desktop
+function DetailPanel({ person, onClose, isMobile }) {
   const panelRef = useRef(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchOffset, setTouchOffset] = useState(0);
 
   useEffect(() => {
     if (!person) return;
@@ -263,74 +266,139 @@ function DetailPanel({ person, onClose }) {
     };
   }, [person, onClose]);
 
+  // Touch gesture handling for swipe-to-close on mobile
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    setTouchStart(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isMobile || touchStart === null) return;
+    const currentTouch = e.touches[0].clientY;
+    const diff = currentTouch - touchStart;
+
+    // Only allow downward swipe
+    if (diff > 0) {
+      setTouchOffset(diff);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobile) return;
+
+    // Close if swiped down more than 100px
+    if (touchOffset > 100) {
+      onClose();
+    }
+
+    setTouchOffset(0);
+    setTouchStart(null);
+  };
+
   if (!person) return null;
 
   return (
-    <div
-      ref={panelRef}
-      className="fixed right-0 top-0 h-full w-80 bg-white/95 shadow-2xl border-l border-stone-200 p-6 overflow-y-auto z-50"
-      style={{ backdropFilter: 'blur(20px)' }}
-    >
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-600 transition-colors"
+    <>
+      {/* Backdrop for mobile */}
+      {isMobile && (
+        <div
+          className="fixed inset-0 bg-black/30 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Panel */}
+      <div
+        ref={panelRef}
+        className={`
+          fixed bg-white/95 shadow-2xl p-6 overflow-y-auto z-50
+          transition-transform duration-300
+          ${isMobile
+            ? 'inset-x-0 bottom-0 h-[70vh] rounded-t-3xl border-t border-stone-200'
+            : 'right-0 top-0 h-full w-80 lg:w-96 border-l border-stone-200'
+          }
+        `}
+        style={{
+          backdropFilter: 'blur(20px)',
+          transform: isMobile ? `translateY(${touchOffset}px)` : 'none',
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        ✕
-      </button>
+        {/* Mobile drag handle */}
+        {isMobile && (
+          <div className="flex justify-center mb-4 md:hidden">
+            <div className="w-12 h-1.5 bg-stone-300 rounded-full" />
+          </div>
+        )}
 
-      <div className="text-center mb-6">
-        <div
-          className="text-6xl w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4"
-          style={{
-            background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%, #fdba74 100%)',
-            boxShadow: '0 8px 32px rgba(251, 191, 36, 0.3)',
-          }}
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className={`
+            absolute w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200
+            flex items-center justify-center text-stone-600 transition-colors
+            ${isMobile ? 'top-6 right-6' : 'top-4 right-4'}
+          `}
         >
-          {person.photo}
+          ✕
+        </button>
+
+        <div className="text-center mb-6">
+          <div
+            className="text-6xl w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4"
+            style={{
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%, #fdba74 100%)',
+              boxShadow: '0 8px 32px rgba(251, 191, 36, 0.3)',
+            }}
+          >
+            {person.photo}
+          </div>
+          <h2 className="text-2xl font-bold text-stone-800 mb-1 font-display">
+            {person.name}
+          </h2>
+          <p className="text-stone-500">
+            {person.birth}{person.death ? ` — ${person.death}` : ' — Present'}
+          </p>
         </div>
-        <h2 className="text-2xl font-bold text-stone-800 mb-1 font-display">
-          {person.name}
-        </h2>
-        <p className="text-stone-500">
-          {person.birth}{person.death ? ` — ${person.death}` : ' — Present'}
-        </p>
-      </div>
 
-      <div className="space-y-4">
-        <div
-          className="p-4 rounded-xl"
-          style={{ background: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' }}
-        >
-          <h3 className="text-sm font-semibold text-amber-800 uppercase tracking-wide mb-2">
-            Vital Information
-          </h3>
-          <div className="space-y-2 text-stone-700">
-            <div className="flex justify-between">
-              <span className="text-stone-500">Birth Year</span>
-              <span className="font-medium">{person.birth || 'Unknown'}</span>
-            </div>
-            {person.birthPlace && (
+        <div className="space-y-4">
+          <div
+            className="p-4 rounded-xl"
+            style={{ background: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' }}
+          >
+            <h3 className="text-sm font-semibold text-amber-800 uppercase tracking-wide mb-2">
+              Vital Information
+            </h3>
+            <div className="space-y-2 text-stone-700">
               <div className="flex justify-between">
-                <span className="text-stone-500">Birthplace</span>
-                <span className="font-medium text-right text-sm max-w-[180px]">{person.birthPlace}</span>
+                <span className="text-stone-500">Birth Year</span>
+                <span className="font-medium">{person.birth || 'Unknown'}</span>
               </div>
-            )}
-            {person.death && (
+              {person.birthPlace && (
+                <div className="flex justify-between">
+                  <span className="text-stone-500">Birthplace</span>
+                  <span className="font-medium text-right text-sm max-w-[180px]">{person.birthPlace}</span>
+                </div>
+              )}
+              {person.death && (
+                <div className="flex justify-between">
+                  <span className="text-stone-500">Death Year</span>
+                  <span className="font-medium">{person.death}</span>
+                </div>
+              )}
               <div className="flex justify-between">
-                <span className="text-stone-500">Death Year</span>
-                <span className="font-medium">{person.death}</span>
+                <span className="text-stone-500">Status</span>
+                <span className={`font-medium ${person.death ? 'text-stone-500' : 'text-emerald-600'}`}>
+                  {person.death ? 'Deceased' : 'Living'}
+                </span>
               </div>
-            )}
-            <div className="flex justify-between">
-              <span className="text-stone-500">Status</span>
-              <span className={`font-medium ${person.death ? 'text-stone-500' : 'text-emerald-600'}`}>
-                {person.death ? 'Deceased' : 'Living'}
-              </span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -346,6 +414,9 @@ export default function AppReactFlow() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  // Responsive breakpoint detection
+  const isMobile = useIsMobile();
 
   // Load GEDCOM
   useEffect(() => {
@@ -578,19 +649,23 @@ export default function AppReactFlow() {
 
       {/* Header */}
       <header className="relative z-10 flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-stone-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <span className="text-amber-600 text-xl">🌳</span>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          {/* Top Row: Title + User Selector */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-amber-600 text-lg sm:text-xl">🌳</span>
               <div>
-                <h1 className="text-xl font-bold text-stone-800">The Powell Family <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full ml-2">React Flow</span></h1>
+                <h1 className="text-lg sm:text-xl font-bold text-stone-800">
+                  The Powell Family
+                  <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full ml-2 hidden sm:inline">React Flow</span>
+                </h1>
                 <p className="text-xs text-stone-500">Ancestry Explorer</p>
               </div>
             </div>
             <select
               value={currentUser}
               onChange={(e) => setCurrentUser(e.target.value)}
-              className="px-3 py-1.5 bg-white rounded-full border border-stone-300 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
+              className="px-3 py-2 sm:py-1.5 bg-white rounded-full border border-stone-300 text-stone-700 text-sm font-medium shadow-sm hover:shadow transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
             >
               {Object.entries(userConfig).map(([key, config]) => (
                 <option key={key} value={key}>
@@ -600,30 +675,33 @@ export default function AppReactFlow() {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Bottom Row: Search + Controls */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-wrap">
             <SearchBar
               individuals={parsedData.individuals}
               onSelectPerson={navigateToPerson}
             />
-            <div className="flex-1 min-w-0" />
-            <button
-              onClick={expandAll}
-              className="px-3 py-1.5 bg-white hover:bg-stone-50 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all"
-              title="Expand All"
-            >
-              📖
-            </button>
-            <button
-              onClick={collapseAll}
-              className="px-3 py-1.5 bg-white hover:bg-stone-50 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all"
-              title="Collapse All"
-            >
-              📕
-            </button>
-            <GenerationControl
-              maxGenerations={maxGenerations}
-              setMaxGenerations={setMaxGenerations}
-            />
+            <div className="hidden sm:flex sm:flex-1 sm:min-w-0" />
+            <div className="flex items-center gap-2 justify-end">
+              <button
+                onClick={expandAll}
+                className="px-3 py-2 sm:py-1.5 bg-white hover:bg-stone-50 active:bg-stone-100 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all min-h-[44px] sm:min-h-0"
+                title="Expand All"
+              >
+                📖
+              </button>
+              <button
+                onClick={collapseAll}
+                className="px-3 py-2 sm:py-1.5 bg-white hover:bg-stone-50 active:bg-stone-100 rounded-full border border-stone-200 text-stone-700 text-xs font-medium shadow-sm transition-all min-h-[44px] sm:min-h-0"
+                title="Collapse All"
+              >
+                📕
+              </button>
+              <GenerationControl
+                maxGenerations={maxGenerations}
+                setMaxGenerations={setMaxGenerations}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -686,20 +764,21 @@ export default function AppReactFlow() {
       <DetailPanel
         person={selectedPerson}
         onClose={() => setSelectedPerson(null)}
+        isMobile={isMobile}
       />
 
-      {/* Legend */}
-      <div className="fixed bottom-4 left-4 z-40">
-        <div className="flex items-center gap-4 px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-sm text-stone-600">
-          <div className="flex items-center gap-2">
+      {/* Legend - Responsive positioning to avoid overlap */}
+      <div className="fixed bottom-3 left-3 right-3 sm:right-auto sm:bottom-4 sm:left-4 z-40">
+        <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-4 px-3 sm:px-4 py-2 bg-white/90 rounded-full border border-stone-200 shadow-lg text-xs sm:text-sm text-stone-600">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 ring-1 ring-amber-400" />
             <span>You</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="w-3 h-3 rounded-full bg-gradient-to-br from-amber-200 to-amber-400" />
             <span>Living</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="w-3 h-3 rounded-full bg-stone-300 border-2 border-stone-400" />
             <span>Deceased</span>
           </div>
