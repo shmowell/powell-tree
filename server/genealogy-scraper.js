@@ -81,72 +81,17 @@ export async function searchESPL(name) {
     return results.slice(0, 10); // Limit to 10 results
     */
 
-    // MOCK DATA for demonstration (remove when site access is granted)
-    return getMockESPLData(name);
+    throw new Error(`Scraping failed: ${error.message}. Consider using the stealth-scraper.js instead.`);
 
   } catch (error) {
     console.error('ESPL search error:', error.message);
 
     if (error.response?.status === 403) {
-      console.log('Site returned 403 Forbidden - using mock data for demonstration');
-      return getMockESPLData(name);
+      throw new Error('Site returned 403 Forbidden. Use stealth-scraper.js for anti-detection techniques.');
     }
 
     throw error;
   }
-}
-
-/**
- * Get mock ESPL data for demonstration purposes
- * This simulates what would be returned from actual scraping
- */
-function getMockESPLData(searchName) {
-  const firstName = searchName.split(' ')[0];
-
-  // Mock Watson family data (example)
-  const mockData = [
-    {
-      name: 'John Watson',
-      birthDate: '1845',
-      birthPlace: 'Scotland',
-      deathDate: '1920',
-      deathPlace: 'Pennsylvania, USA',
-      parents: ['William Watson', 'Mary Thompson'],
-      spouse: 'Elizabeth Brown',
-      source: 'espl-genealogy.org',
-      url: 'https://www.espl-genealogy.org/mearscol/pagendxw/watson/d322.htm#P323',
-      confidence: 0
-    },
-    {
-      name: 'William Watson',
-      birthDate: '1820',
-      birthPlace: 'Scotland',
-      deathDate: '1890',
-      deathPlace: 'Scotland',
-      parents: ['James Watson', 'Sarah McDonald'],
-      spouse: 'Mary Thompson',
-      source: 'espl-genealogy.org',
-      url: 'https://www.espl-genealogy.org/mearscol/pagendxw/watson/d320.htm',
-      confidence: 0
-    },
-    {
-      name: 'Mary Watson',
-      birthDate: '1848',
-      birthPlace: 'Ireland',
-      deathDate: '1925',
-      deathPlace: 'Pennsylvania, USA',
-      spouse: 'John Watson',
-      source: 'espl-genealogy.org',
-      url: 'https://www.espl-genealogy.org/mearscol/pagendxw/watson/d322.htm',
-      confidence: 0
-    }
-  ];
-
-  // Filter by first name similarity
-  return mockData.filter(person =>
-    person.name.toLowerCase().includes(firstName.toLowerCase()) ||
-    firstName.toLowerCase().includes(person.name.split(' ')[0].toLowerCase())
-  );
 }
 
 /**
